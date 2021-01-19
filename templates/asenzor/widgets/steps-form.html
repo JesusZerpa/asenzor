@@ -1,0 +1,13 @@
+<div>
+	{%if before_link_avalible%}
+		<a href="{{brefore_link}}" class="btn btn-primary">Solicitud anterior</a>
+	{%endif%}
+	{%if after_link_avalible%}
+		<a href="{{after_link}}" class="btn btn-primary">Solicitud Siguiente</a>
+	{%endif%}
+<form method="POST">
+	
+	{{form}}
+	<button class="btn btn-primary">Guardar</button>
+</form>
+</div>

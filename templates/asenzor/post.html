@@ -1,0 +1,267 @@
+{% extends "asenzor/layouts/dashboard.html" %}
+{%load static%}
+{%load  custom_filters%}
+{%block content%}
+<div id="post_toolbar">
+	<div class="options">
+	<a href="#screen-options">Opciones en pantalla</a>
+	<a href="#help">Ayuda</a>	
+	</div>
+	
+</div>
+<style type="text/css">
+	.search-field:focus{
+		outline: none;
+	}
+	.search-field{
+		background: rgba(0,0,0,0.04);
+		border: none;
+		width: 100%;
+	}
+	.navbar-fixed {
+		position:fixed;
+		top:0;
+		width: 100%;
+	}
+	.panel2-fixed {
+		position:fixed;
+	
+		top:66px;
+		max-width:1000px;
+		height: calc(100vh - 66px);
+		right: 0px;
+		box-shadow:0px 4px 3px rgba(0,0,0,.5);
+	}
+	#panel2-short{
+		display: none;
+	}
+	@media(max-width: 425px){
+		.panel2-fixed {
+			top:0px;
+			position: relative;
+			right: inherit;
+
+		}
+		#panel2-short{
+			display: block;
+			position: fixed;
+			right: 5px;
+			bottom: 5px;
+			z-index: 1000;
+
+		}
+	}
+	
+	#alert{
+		z-index: 500;
+	}
+</style>
+
+{%for name,template in VUE_TEMPLATES.items%}
+	<script type="text/x-template" id="{{name}}">
+	{%include template%}
+	</script>
+	{%endfor%}
+<div id="edit_app" class="container" post_type="{{post_type}}" style="background: rgb(241, 241, 241)">
+
+	
+	<div class="row">
+		<div class="col-md-8">
+			<br>
+	<div class="form-group">
+		<input 
+			v-model.trim="title" 
+			type="" 
+			name="title" 
+			:ref="'title'"
+			value="{{post.title}}" 
+			class="form-control">
+	</div>
+	<div style="margin-bottom: 50px">
+		<!--
+		<pre>
+			[[content]]
+		</pre>
+	-->
+		<input 
+			type="hidden" 
+			name="type" 
+			data-value="{{post.type}}"
+			v-model="type" 
+			:ref="'type'" 
+			>
+			{%if post_type == "custom"%}
+			{%if form%}
+			<div id="content">
+			{{form}}		
+			</div>
+			{%elif page%}
+			<div :ref="'panel1'">
+				<input class="search-field" type="" name="" 
+				style="">
+			{%for key,group in page.items%}
+
+			<div class="card" >
+				<div class="card-header" :ref="'toogle-{{forloop.counter0}}'" @click="toogle['toogle-{{forloop.counter0}}']=!toogle['toogle-{{forloop.counter0}}']"
+				data-toggle="collapse" href="#collapse{{key}}" role="button" 
+				{%if forloop.counter0 == 0 %}
+				aria-expanded="true" 
+				{%else%}
+				aria-expanded="false"
+				{%endif%}
+
+				aria-controls="collapseExample"
+				style="display: flex;flex-direction: row; justify-content: space-between;" 
+				 >{{key}} 
+				 <div>
+			<span class="btn" style="
+			background: url('{{BASE_URL}}static/img/arrowup.png');
+			background-repeat: no-repeat;
+			background-size: contain;"> 
+			</span>
+			<span class="btn" style="
+				background: url('{{BASE_URL}}static/img/arrowdown.png');
+				background-repeat: no-repeat;
+				background-size: contain;">
+			</span> 	
+				 </div>
+				</div>
+			<div  id="collapse{{key}}"  class="card-body collapse {%if forloop.counter0 == 0 %} show {%endif%}" v-if="toogle['toogle-{{forloop.counter0}}']">
+			{%for name,item in group.items%}
+			<div >
+			<div>
+			<label>{{name}}</label>	
+			</div>
+			<div >
+			{{item}}		
+			</div>
+				
+			</div>
+			
+			{%endfor%}
+			</div></div>
+			{%endfor%}
+			</div>
+			{%endif%}
+		
+		
+     	{%else%}
+  
+		<editor
+       api-key="no-api-key"
+       :init="{
+         height: 500,
+         menubar: false,
+         plugins: [
+           'advlist autolink lists link image charmap print preview anchor',
+           'searchreplace visualblocks code fullscreen',
+           'insertdatetime media table paste code help wordcount',
+           'textcolor'
+         ],
+         toolbar:
+           'undo redo | formatselect | bold italic backcolor forecolor| \
+           alignleft aligncenter alignright alignjustify | \
+           bullist numlist outdent indent | removeformat | help'
+       }"
+       name="content"
+       :ref="'editor'"
+       :value='content'
+       v-model="content"
+       
+       
+     ></editor>	
+     	
+     	{%endif%}
+     	<div id="panel2-short">
+     		<button ><span class="btn" style="
+				background: url('{{BASE_URL}}static/img/arrowdown.png');
+				background-repeat: no-repeat;
+				background-size: contain;
+				background-position: center;">
+			</span> </button>
+     		<button class="btn btn-primary">Guardar</button>
+     	</div>
+	
+   </div>	
+		</div>
+		<div class="col-md-4">
+			<br>
+			<div :ref="'panel2'" class="panel2">
+			<input class="search-field" type="" name="" 
+				style="">
+			<div class="card">
+				<div class="card-header">
+					<b>Publicar</b>
+				</div>
+				<div class="card-body">
+				<button class="btn btn-primary" @click="publish()">Publicar</button>
+				<button class="btn btn-success" @click="save()">Guardar</button>
+				{%if post.id%}
+				<a href="" style="color: red">Eliminar</a>
+				{%endif%}	
+				</div>
+				
+			</div>
+			<br>
+			<div class="card">
+				<div class="card-header">
+					<b>Atributos de página</b>
+				</div>
+				<div class="card-body">
+					<div>
+				<label>Orden</label>
+				
+				<input  
+					v-model="order"  
+					value="{%if post.menu_order %}{{post.menu_order}}{%else%}0{%endif%}" 
+					:ref="'order'" 
+					type="" 
+					name="" 
+					style="max-width: 50px;" >		
+					</div>
+				<div>
+				<label>Template</label>
+				<select v-model="template" :ref="'template'" value="{{meta.template}}">
+					{%for elem in templates%}
+					<option>{{elem}}</option>
+					{%endfor%}
+				</select>	
+				</div>
+				
+				</div>
+				
+			</div>
+			<br>
+			<div class="card">
+				<div class="card-header">
+					<b>Imagen destacada</b>
+				</div>
+				<div class="card-body">
+					<div>
+						<span style="
+						position: absolute;
+						right:0;
+						cursor: pointer;" 
+						v-if="main_image"
+						@click="main_image=null">X</span>
+					<img :src="main_image">	
+					</div>
+				<span @click="update_main_image()" style="color:lightblue;cursor: pointer;">Establecer imagen destacada</span>
+				</div>
+				
+			</div>	
+			</div>
+			
+		</div>
+	</div>
+	
+	
+	</div>
+
+{% include "asenzor/widgets/media.html"%}
+
+
+{%endblock%}
+{%block 'footer'%}
+<script src="{%static 'woodridge/dist/main.js'%}"></script>
+{%endblock%}

@@ -1,0 +1,49 @@
+{%extends "layouts/dashboard.html" %}
+{% load static %}
+{%load custom_filters%}
+
+{% block content %}
+
+<div class="col-md-11">
+  <div class="row">
+    <div class="col-md-5 text-center">
+      <h1>Pandora</h1>
+      <div id="hook-response"></div>
+      <img style="display: inline-block;width: 100%;height: auto" src="{%static 'img/7e5e0c2b6f4f7fdc4e4c30d39da42ab9689e728e_hq.gif'%}">
+      <div id="root"></div>
+    </div>
+    <div class="col-md-7">
+      <h3 style="text-align: center">Area contextual</h3>
+      <div style="display: inline-block;">
+        
+        <div id="hook-ctx"></div>
+      </div>
+    </div>
+    
+      
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      
+      <p>
+        Pandora es una plataforma de agente inteligente que buscara de resolver solicitudes que el usuario le consulte, este debera devolver la mejor respuesta de su consulta 
+      </p>
+    </div>
+<div>
+      
+      
+</div>
+  </div>
+  
+</div>
+<form>
+
+</form>
+
+{% endblock %}
+
+{%block footer%}
+{% endblock %}
+
+
+

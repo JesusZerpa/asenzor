@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, user-scalable=no">
+	<meta charset="utf-8">
+	<title>Asenzor</title>
+{%load static%}
+
+<link rel="stylesheet" type="text/css" href="{%static 'asenzor/css/grapes.min.css'%}">
+<script src="{%static 'asenzor/js/grapes.min.js'%}"></script>
+
+</head>
+<body>
+
+<div id="gjs"></div>
+
+<script type="text/javascript">
+  var editor = grapesjs.init({
+      container : '#gjs',
+      components: '<div class="txt-red">Hello world!</div>',
+      style: '.txt-red{color: red}',
+      fromElement: true,
+        storageManager: { autoload: 0 },
+        styleManager : {
+          sectors: [{
+              name: 'General',
+              open: false,
+              buildProps: ['float', 'display', 'position', 'top', 'right', 'left', 'bottom']
+            },{
+              name: 'Flex',
+              open: false,
+              buildProps: ['flex-direction', 'flex-wrap', 'justify-content', 'align-items', 'align-content', 'order', 'flex-basis', 'flex-grow', 'flex-shrink', 'align-self']
+            },{
+              name: 'Dimension',
+              open: false,
+              buildProps: ['width', 'height', 'max-width', 'min-height', 'margin', 'padding'],
+            },{
+              name: 'Typography',
+              open: false,
+              buildProps: ['font-family', 'font-size', 'font-weight', 'letter-spacing', 'color', 'line-height', 'text-shadow'],
+            },{
+              name: 'Decorations',
+              open: false,
+              buildProps: ['border-radius-c', 'background-color', 'border-radius', 'border', 'box-shadow', 'background'],
+            },{
+              name: 'Extra',
+              open: false,
+              buildProps: ['transition', 'perspective', 'transform'],
+            }
+          ],
+        },
+  });
+  editor.BlockManager.add('testBlock', {
+        label: 'Block',
+        attributes: { class:'gjs-fonts gjs-f-b1' },
+        content: `<div style="padding-top:50px; padding-bottom:50px; text-align:center">Test block</div>`
+      })
+editor.BlockManager.add("facebook-signin", {
+    label: "Facebook sign-in",
+    content:
+      '<div id="social-sign-in-buttons-section" class="social" data-gjs-droppable="social-signin">' +
+      '<div class="pull-left social-sign-in-button padding-right-small" data-gjs-droppable=".fa .fa-facebook-square">' +
+      '<img class="social-signin" data-gjs-draggable="social" src="facebook.png" id="facebook" title="facebook" >' +
+      "</img>" +
+      "</div>" +
+      "</div>",
+    attributes: {
+      class: "fa fa-facebook"
+    }
+  });
+editor.BlockManager.add('my-map-block', {
+  label: 'Simple map block',
+  content: {
+    type: 'map', // Built-in 'map' component
+    style: {
+      height: '350px'
+    },
+    removable: false, // Once inserted it can't be removed
+  }
+})
+editor.BlockManager.add('the-row-block', {
+  label: '2 Columns',
+  content: '<div class="row" data-gjs-droppable=".row-cell" data-gjs-custom-name="Row">' +
+      '<div class="row-cell" data-gjs-draggable=".row"></div>' +
+      '<div class="row-cell" data-gjs-draggable=".row"></div>' +
+    '</div>',
+});
+editor.BlockManager.add('some-block-id', {
+  label: `<div>
+      <img src="https://picsum.photos/70/70"/>
+      <div class="my-label-block">Label block</div>
+    </div>`,
+  content: '<div>...</div>',
+  render: ({ model, className }) => `<div class="${className}__my-wrap">
+      Before label
+      ${model.get('label')}
+      After label
+    </div>`,
+});
+  /*
+var editor = grapesjs.init({
+        showOffsets: 1,
+        noticeOnUnload: 0,
+        container: '#gjs',
+        height: '100%',
+        fromElement: true,
+        storageManager: { autoload: 0 },
+        styleManager : {
+          sectors: [{
+              name: 'General',
+              open: false,
+              buildProps: ['float', 'display', 'position', 'top', 'right', 'left', 'bottom']
+            },{
+              name: 'Flex',
+              open: false,
+              buildProps: ['flex-direction', 'flex-wrap', 'justify-content', 'align-items', 'align-content', 'order', 'flex-basis', 'flex-grow', 'flex-shrink', 'align-self']
+            },{
+              name: 'Dimension',
+              open: false,
+              buildProps: ['width', 'height', 'max-width', 'min-height', 'margin', 'padding'],
+            },{
+              name: 'Typography',
+              open: false,
+              buildProps: ['font-family', 'font-size', 'font-weight', 'letter-spacing', 'color', 'line-height', 'text-shadow'],
+            },{
+              name: 'Decorations',
+              open: false,
+              buildProps: ['border-radius-c', 'background-color', 'border-radius', 'border', 'box-shadow', 'background'],
+            },{
+              name: 'Extra',
+              open: false,
+              buildProps: ['transition', 'perspective', 'transform'],
+            }
+          ],
+        },
+      });
+
+      editor.BlockManager.add('testBlock', {
+        label: 'Block',
+        attributes: { class:'gjs-fonts gjs-f-b1' },
+        content: `<div style="padding-top:50px; padding-bottom:50px; text-align:center">Test block</div>`
+      })
+  */
+</script>
+
+
+</body>
+</html>

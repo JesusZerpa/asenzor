@@ -1,0 +1,12 @@
+{
+  "webpack": {
+    "entry": {
+      "main": "./asenzor/py/main.py"
+    },
+    "output": {
+      "path": "/home/zerpa/workspace/dj-woodridge/woodridge/asenzor/static/asenzor/dist",
+      "filename": "[name].js"
+    }
+  },
+  "secret_key": "M^CI1a20eqv#E0JtQLJJRPwOvi3vJv8NTKFF&c6vIoFhlWWyol"
+}

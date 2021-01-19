@@ -1,0 +1,153 @@
+{%extends "asenzor/layouts/base.html"%}
+{% load static %}
+{% load custom_filters%}
+{%block head%}
+<link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap-tagsinput.css'%}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/simple-sidebar.css'%}">
+<link rel="stylesheet" type="text/css" href="{% static 'asenzor/css/index.css'%}">
+<style type="text/css">
+	.bootstrap-tagsinput .tag{
+		color:gray;
+		
+	}
+</style>
+<script type="text/javascript" src="{% static 'js/bootstrap-tagsinput.min.js' %}"></script>
+<script src="https://cdn.tiny.cloud/1/b09tt8f829lohvfejyj3w3hknkp0f0sazoh4r1s73sszb6pt/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+	window.BASE_URL='{{BASE_URL}}'
+  window.ASENZOR_URL='{{ASENZOR_URL}}'
+	window.BASE_URL_FULL='{{BASE_URL_FULL}}'
+  {%if DATA%}
+  window.DATA={{DATA|json}}
+  {%else%}
+  window.DATA={}
+  {%endif%}
+  window.VUE_COMPONENTS={"asenzor":{}}
+</script>
+{%endblock%}
+{%block main%}
+
+
+
+<div class="d-flex" id="wrapper">
+
+
+ <sidebar class="bg-light border-right"  id="sidebar-wrapper">
+<div class="sidebar-heading" >
+    <div style="max-width: 180px">
+      <div class="text-center" style="border: solid;
+    border-width: 1px;
+    border-color: gray;
+    border-radius: 12px;">
+        <img style="width: 80px" src="{{BASE_URL}}static/img/logo-asenzor.png">
+      </div>
+        
+        <a href="{{BASE_URL}}dashboard/">Asenzor v0.1.0</a>
+    <span style="color:green">Beta</span>
+  <!-- <a href="{{BASE_URL}}notifications">0</a>--> 
+    </div>
+</div>
+
+ <div  id="sidemenu" class="list-group list-group-flush">
+<input id="search_module" name="" placeholder="Buscar modulo..." onkeydown="{self.search(event)}"> 
+
+{%for item in ADMIN_MENU%}
+<a href="{{item.0}}" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span>{{item.1}}</a>
+{%endfor%}
+</div> 
+</sidebar>
+<div id="page-content-wrapper">
+	<header>
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+   <button class="btn btn-primary" id="menu-toggle" style="height: 50px"></button>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+  <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+    <ul class="nav navbar-nav">
+      {%for item in ADMIN_NAVBAR%}
+      <li><a href="{{item.0}}" class="list-group-item list-group-item-action bg-dark" style="color:white"><span class="glyphicon glyphicon-user"></span>{{item.1}}</a></li>
+      {%endfor%}
+
+      <li class="navbar-right">
+      </li>
+
+      <li class="navbar-right">
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown" role="button" aria-expanded="false"><span class="glyphicon glyphicon-info-sign"></span> <img style="width: 30px;height: 30px;" src="http://2.gravatar.com/avatar/29e63267f1362fb2c616473593a30dab?s=26&d=mm&r=g">{{user.get_username}}<span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu">
+            <li class="nav-link" ><a href="{{ASENZOR_URL}}user/{{user.id}}/edit/">Editar perfil</a></li>
+            <li class="nav-link" ><a href="{{ASENZOR_URL}}wiki/index.html">ayuda</a></li>
+            <li class="nav-link" ><a href="{{BASE_URL}}admin/logout">Cerrar session</a></li>
+          </ul>
+      </li>
+      
+      </li>
+    </ul>
+ 
+  </div>
+</nav>
+	</header>
+{%block content%}
+<div>
+  {%for card in cards%}
+    <div class="card" >
+     
+    <div class="card-header">
+      {{plugin.title}}   
+    </div>
+    <div class="card-body">
+      {{card.message}}
+    </div>
+  </div>
+  {%endfor%}
+</div>
+{%endblock%}
+</div>
+</div>
+</div>
+
+
+	
+	
+
+
+</div>
+	
+</div>
+<div class="modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Modal body text goes here.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary">Save changes</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% apply_filter "footer" request %}
+{%for script in scripts%}
+
+<script type="module" src=/{{script}}></script>
+{%endfor%}
+
+<script src="{%static 'asenzor/dist/main.js'%}"></script>
+{%endblock%}
+
+{%block footer%}
+{%endblock%}
+
+
+
+
+

@@ -1,0 +1,155 @@
+
+<div class="modal" tabindex="-1" role="dialog" id="media_modal">
+  <div class="modal-dialog modal-lg" style="max-width:99%;padding-right: 0px" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Bibliotecas de medios</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">
+    <div class="row">
+         <div class="col-md-2 actions" >
+            <b>Acciones</b>
+            <span class="blue-actions">Añadir medios</span>
+            <span class="blue-actions">Crear Galeria</span>
+            <span class="blue-actions">Crear Lista de reproducción de audio</span>
+            <span class="blue-actions">Crear Lista de reproducción de video</span>
+            <span class="blue-actions">Imagen destacada</span>
+            <span class="blue-actions">Insertar desde URL</span>
+          </div>
+          <div class="col-md-6">
+
+            
+          <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item">
+            <a class="nav-link active" data-toggle="tab" data-toggle="tab" role="tab" id="subir-archivo-tab" aria-selected="true" href="#subir-archivo-panel">Subir archivos</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" data-toggle="tab" role="tab" id="biblioteca-medios-tab" aria-selected="false" href="#biblioteca-medios-panel">Biblioteca de medios</a>
+          </li>
+         </ul>
+          <div class="tab-content"  style="height: calc(100% - 42px)">
+            
+          <div class="tab-pane fade show active" :ref="'tab1'" id="subir-archivo-panel"  role="tabpanel" aria-labelledby="subir-archivo-tab" style="height: 100%">
+        <div  class="dragdrop-container" @drag="drag"
+           @drop="drop"
+           @click="upload"
+           
+            >
+           <form  ref = "fileform">
+           <svg class="box__icon" xmlns="http://www.w3.org/2000/svg" width="50" height="43" viewBox="0 0 50 43"><path d="M48.4 26.5c-.9 0-1.7.7-1.7 1.7v11.6h-43.3v-11.6c0-.9-.7-1.7-1.7-1.7s-1.7.7-1.7 1.7v13.2c0 .9.7 1.7 1.7 1.7h46.7c.9 0 1.7-.7 1.7-1.7v-13.2c0-1-.7-1.7-1.7-1.7zm-24.5 6.1c.3.3.8.5 1.2.5.4 0 .9-.2 1.2-.5l10-11.6c.7-.7.7-1.7 0-2.4s-1.7-.7-2.4 0l-7.1 8.3v-25.3c0-.9-.7-1.7-1.7-1.7s-1.7.7-1.7 1.7v25.3l-7.1-8.3c-.7-.7-1.7-.7-2.4 0s-.7 1.7 0 2.4l10 11.6z"></path></svg>
+          <label for="file"><strong>Choose a file</strong><span class="box__dragndrop"> or drag it here</span>.</label> 
+         
+           
+           </form>
+           
+          
+        </div>  
+        </div>
+
+        <div class="tab-pane fade" role="tabpanel" :ref="'tab2'" aria-labelledby="biblioteca-medios-tab" id="biblioteca-medios-panel" style="height: 100%">
+          <div class="preview-container" style="overflow: auto;max-height: 400px" >
+            
+          
+          <div >
+            <span>Filtrar medios</span>
+
+            <select>
+              <option>Todos los medios</option>
+              <option>Subido a esta pagina</option>
+              <option>Imagenes</option>
+              <option>Audio</option>
+              <option>Video</option>
+              <option>Documentos</option>
+              <option>Hojas de calculo</option>
+              <option>Archivos</option>
+              <option>Sin Adjuntar</option>
+              <option>Mios</option>
+
+            </select>
+            <select>
+              <option>Todas las fechas</option>
+              <option>Diciembre 2020</option>
+            </select>
+            <input type="" name="" placeholder="Buscar.." v-model="search" >
+          </div>
+         
+          <div v-for="(image, key) in images" class="file-listing" style="display: inline-block;">
+            <div>
+       
+               <img class="preview" 
+                 style="
+                 width: 80px;
+                 height: 80px;
+                 object-fit: contain;
+                 "
+                 v-if="search=='' || image.title.indexOf(search)>-1 "
+                 :key="image.id"
+                 :id="image.id"
+                 :ref="'media_'+image.id"
+                 :name="image.name"
+                 :title="image.title"
+                 :description='image.description'
+                 :src="'{{ MEDIA_URL }}'+image.sizes.thumbail.url"
+                 loading="lazy"
+                 @click="select('media_'+image.id)">
+              <progress max="100" :value.prop="uploadPercentage" hidden=""></progress>
+            </div>
+           
+          </div>  
+          <div class = "remove-container"> 
+            <a class="remove" v-on:click="removeFile( key )"> Eliminar </a> 
+          </div>
+        </div>
+        
+        </div>
+        </div>
+        </div>
+        <div class="col-md-4" style="overflow: scroll;">
+          <div v-if="active" >
+
+          <img :src="'{{BASE_URL}}media/'+active.src" style="max-width: 280px">
+          <span style="color:blue;cursor:pointer" @click="edit()">Editar Imagen</span>
+          <span style="color:red;cursor:pointer" @click="remove()">Borrar Permanentemente</span>
+  
+          <table>
+            <tr>
+              <td><label>Texto alternativo</label></td>
+              <td><input type="" :value="active.name"></td>
+            </tr>
+            <tr>
+              <td><label>Titulo</label></td>
+              <td><input type="" :value="active.title"></td>
+            </tr>
+            <tr>
+              <td><label>Leyenda</label></td>
+              <td><textarea>[[active.leyenda]]</textarea></td>
+            </tr>
+            <tr>
+              <td><label>Description</label></td>
+              <td><textarea>[[active.description]]</textarea></td>
+            </tr>
+            <tr>
+              <td><label>Url del archivo</label></td>
+              <td><input type="" name="" disabled="" :value="active.src">
+                <button>Copiar al portapapeles</button></td>
+            </tr>
+          </table>
+          
+        </div>
+        </div>
+
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" @click="accept()">Aceptar</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+  </div>
+</div>

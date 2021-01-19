@@ -1,0 +1,48 @@
+{%extends "asenzor/layouts/dashboard.html"%}
+{%block content%}
+<div class="container">
+<div  class="row">
+	<div class="col-md-12">
+	<h1>{{title}}</h1>
+	{%for field in item%}
+	<div>
+		<label><b>{{field.0}}</b></label>
+	<p>
+		
+	{{field.1}}
+	</p>	
+	</div>
+	{%endfor%}	
+	</div>
+	<a href="{{request.get_full_path }}edit"class="btn btn-primary">Editar</a>
+	<a href="{{request.get_full_path }}delete"class="btn btn-danger">Eliminar</a>
+	{%for btn in btns%}
+	<a href="{{request.get_full_path }}{{btn.0}}" class="btn btn-primary">{{btn.1}}</a>
+	{%endfor%}
+</div>
+<div  class="row">
+	<div class="col-md-12">
+	<H5>Metadatos</H5>
+	<table class="table">
+	<tr  class="thead-dark">
+		<th></th>
+		<th>Nombre</th>
+		<th>Valor</th>
+		<th>Descripción</th>
+		<th>Acciones</th>
+	</tr>
+	{%for field in meta%}
+	<tr>
+		<td><input type="checkbox" name=""></td>
+		<td>{{field.name}}</td>
+		<td><input type="" name="" value="{{field.value}}" disabled></td>
+		<td>{{field.description}}</td>
+		<td><button class="btn btn-primary">Guardar</button></td>
+	</tr>
+	{%endfor%}
+	</table>
+	</div>
+
+</div>
+</div>
+{%endblock%}

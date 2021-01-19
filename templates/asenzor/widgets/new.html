@@ -1,0 +1,90 @@
+{% extends "asenzor/layouts/dashboard.html" %}
+{%load static%}
+{%load  custom_filters%}
+{%block head%}
+{{ block.super }}
+
+<link rel="stylesheet" type="text/css" href="{% static 'css/simple-sidebar.css'%}">
+							   
+<link rel="stylesheet" type="text/css" href="/static/admin/css/widgets.css">
+<link rel="stylesheet" type="text/css" href="/static/sortedm2m/widget.css">
+
+<script src="/admin/jsi18n/"></script>
+{{form.media}}	
+<style>
+ul li{
+list-style-type:none;
+
+}
+.sortedm2m-item{
+	border:solid;
+	border-width: 1px;
+	border-color:gray;
+	border-radius: 5px;
+	padding: 2px;
+	background: white;
+}
+</style>
+
+{%endblock%}
+{%block content%}
+
+<div class="container-fluid">
+<div class="row">
+	<div class="col-md-12">
+	<h3>{{title}}</h3>
+	<form method="POST" enctype='multipart/form-data'>
+	<!-- Se usa la diferencia form en lugar de form.as_p porque el nombre debe ser un label de lo contrario causa un bucle inficino en /static/sortedm2m/widget.js-->
+	 {% csrf_token %}
+	{% for field in form %}
+	<div >
+	{{ field.errors }}
+	<label style="vertical-align: top">{{ field.label_tag }}</label>
+	{{field}}	
+	{% if field.help_text %}
+        <p class="help">{{ field.help_text|safe }}</p>
+        {% endif %}
+	</div>
+	
+	{%endfor%}
+	<button class="btn btn-primary">Guardar</button>
+	</form>
+	
+</div></div></div>
+{%endblock%}
+{%block footer%}
+<link rel="stylesheet" type="text/css" href="{% static 'admin/css/widgets.css' %}" />
+
+<script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
+<script type="text/javascript" src="{% static 'admin/js/core.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/js/jquery.init.js' %}"></script>
+
+<script type="text/javascript" src="{% static 'admin/js/SelectBox.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/js/SelectFilter2.js' %}"></script>
+<script>
+      $(function () {
+        $(".datetimepicker").datetimepicker({format:'Y-m-d H:i:s'});
+        $(".datepicker").datepicker();
+        jQuery.datetimepicker.setLocale('ve');
+
+		jQuery('.timepicker').datetimepicker({
+		 i18n:{
+		  de:{
+		   months:[
+		    'Januar','Februar','März','April',
+		    'Mai','Juni','Juli','August',
+		    'September','Oktober','November','Dezember',
+		   ],
+		   dayOfWeek:[
+		    "So.", "Mo", "Di", "Mi", 
+		    "Do", "Fr", "Sa.",
+		   ]
+		  }
+		 },
+		 timepicker:false,
+		 format:'d.m.Y'
+		});
+      });
+    </script>
+{%endblock%}
