@@ -77,7 +77,7 @@ class MainConfig(AppConfig):
 
         msg = MIMEMultipart()
         msg.set_unixfrom('author')
-        msg['From'] = 'asenzor@woodridgeatcarrollwood.com'
+        msg['From'] = sender_email
         msg['To'] = receiver_email
         msg['Subject'] = subject
         msg.attach(MIMEText(message))

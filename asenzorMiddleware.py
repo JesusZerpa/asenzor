@@ -16,9 +16,8 @@ class AsenzorMiddleware(object):
     def __call__(self, request):
         from .signals import render_started
         from django.apps import apps
-
         if not len(Site.objects.all())\
-            and request.get_full_path()!=settings.ASENZOR_URL+"install" and not request.get_full_path().startswith("/admin"):
+            and request.get_full_path()!=settings.ASENZOR_URL+"install/" and not request.get_full_path().startswith("/admin"):
 
             return HttpResponseRedirect(
              settings.ASENZOR_URL+"install"

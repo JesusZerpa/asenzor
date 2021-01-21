@@ -489,14 +489,15 @@ class AppConfig(AppConfig):
         post=Post.objects.get(id=post)
         page=json.loads(post.content)
         data={}
-        for elem in page:
-            data[elem]={}
-            for elem2 in page[elem]:
-                if "value" in page[elem][elem2]:
-                    data[elem][elem2]=page[elem][elem2]["value"]
-         
-                else:
-                    data[elem][elem2]=""
+        if page:
+            for elem in page:
+                data[elem]={}
+                for elem2 in page[elem]:
+                    if "value" in page[elem][elem2]:
+                        data[elem][elem2]=page[elem][elem2]["value"]
+             
+                    else:
+                        data[elem][elem2]=""
         return data
 
 

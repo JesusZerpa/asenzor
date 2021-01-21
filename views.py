@@ -136,11 +136,16 @@ def preview(request,id):
 	postmeta=PostMeta
 	template=postmeta.get(id,"template","index.html")
 	return render(request,template,locals())
-@login_required
+
 def install(request):
+	print("oooo")
 	form=InstallForm()
+
 	if request.method=="GET":
-		return render(request,"asenzor/install.html",locals())
+		if len(Site.objects.all()):
+			return HttpResponseRedirect(settings.ASENZOR_URL)
+		else:
+			return render(request,"asenzor/install.html",locals())
 	elif request.method=="POST":
 	
 		main_site=request.POST.get("main_site")
@@ -158,6 +163,15 @@ def install(request):
 			author=request.user,
 			guid="")
 		post.save()
+		post2=Post.objects.create(
+			title="Pagina de blog",
+			name="blog",
+			type="page",
+			author=request.user,
+			guid="")
+		post2.save()
+		Option.update("frontpage",post.id)
+		Option.update("postpage",post2.id)
 
 
 		return HttpResponseRedirect(settings.ASENZOR_URL)
