@@ -147,34 +147,37 @@ def install(request):
 		else:
 			return render(request,"asenzor/install.html",locals())
 	elif request.method=="POST":
-	
-		main_site=request.POST.get("main_site")
-		site_description=request.POST.get("site_description")
+		if request.user.is_autenticated:
 		
-		site=Site.objects.create(name=main_site,
-							domain=request.get_host(),
-							description=site_description)
-		Site.update_master(site)
-		site.save()
-		post=Post.objects.create(
-			title="Pagina de inicio",
-			name="home",
-			type="page",
-			author=request.user,
-			guid="")
-		post.save()
-		post2=Post.objects.create(
-			title="Pagina de blog",
-			name="blog",
-			type="page",
-			author=request.user,
-			guid="")
-		post2.save()
-		Option.update("frontpage",post.id)
-		Option.update("postpage",post2.id)
+			main_site=request.POST.get("main_site")
+			site_description=request.POST.get("site_description")
+			
+			site=Site.objects.create(name=main_site,
+								domain=request.get_host(),
+								description=site_description)
+			Site.update_master(site)
+			site.save()
+			post=Post.objects.create(
+				title="Pagina de inicio",
+				name="home",
+				type="page",
+				author=request.user,
+				guid="")
+			post.save()
+			post2=Post.objects.create(
+				title="Pagina de blog",
+				name="blog",
+				type="page",
+				author=request.user,
+				guid="")
+			post2.save()
+			Option.update("frontpage",post.id)
+			Option.update("postpage",post2.id)
 
 
-		return HttpResponseRedirect(settings.ASENZOR_URL)
+			return HttpResponseRedirect(settings.ASENZOR_URL)
+		else:
+			return HttpResponse("Necesitas tener un usuario primero, prueba ejecutar python manage.py createsuperuser")
 
 class CustomizeUser(ResourceView):
 	"""docstring for Pages"""
