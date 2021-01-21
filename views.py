@@ -148,7 +148,7 @@ def install(request):
 			return render(request,"asenzor/install.html",locals())
 	elif request.method=="POST":
 		if request.user.is_autenticated:
-		
+
 			main_site=request.POST.get("main_site")
 			site_description=request.POST.get("site_description")
 			
@@ -169,11 +169,10 @@ def install(request):
 				name="blog",
 				type="page",
 				author=request.user,
-				guid="")
+				guid="blog")
 			post2.save()
 			Option.update("frontpage",post.id)
 			Option.update("postpage",post2.id)
-
 
 			return HttpResponseRedirect(settings.ASENZOR_URL)
 		else:

@@ -20,7 +20,7 @@ class AsenzorMiddleware(object):
             and request.get_full_path()!=settings.ASENZOR_URL+"install/" and not request.get_full_path().startswith("/admin"):
 
             return HttpResponseRedirect(
-             settings.ASENZOR_URL+"install"
+             settings.ASENZOR_URL+"install/"
             )
 	
         if "menus" not in apps.get_app_config("asenzor").loadeds:
