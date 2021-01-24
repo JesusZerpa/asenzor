@@ -182,6 +182,9 @@ class Media(VuePy):
         if s(self.vue["$refs"]["tab1"]).hasClass("active"):
             s(self.vue["$refs"]["tab1"]).removeClass("active show")
         s(self.vue["$refs"]["tab2"]).addClass("active show")
+        s(self.vue["$refs"]["tab2"]).addClass("active show")
+        s("#subir-archivo-tab").removeClass("active")
+        s("#biblioteca-medios-tab").addClass("active")
 
     def upload(self):
         pass

@@ -1,6 +1,7 @@
 #from django.apps import AppConfig
 from .lib.apps import AppConfig
 import os,imp,json
+from django.conf import settings
 class MainConfig(AppConfig):
     name = 'asenzor'
     ejecutado=False
@@ -9,8 +10,9 @@ class MainConfig(AppConfig):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.settings["webpack"]["entry"]["main"]="./asenzor/py/main.py"
-        #self.webpack()
-        #self.sass(self.name)
+        if "COMPILE" in dir(settings) in settings.COMPILE:
+            self.webpack()
+            self.sass(self.name)
         self.load_plugins()
         
 

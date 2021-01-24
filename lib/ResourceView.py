@@ -975,7 +975,7 @@ class ResourceViewRest(ResourceView):
                     data=json.loads(request.body)  
                 else:
                     data={key:value for key,value in request.POST.items()}
-                self.middleware("post",request,data)
+                
                 if self.model:
                     for elem in self.model._meta.get_fields():
                         if elem.name in data:
@@ -997,7 +997,10 @@ class ResourceViewRest(ResourceView):
                 if self.model:
                     instance=self.model.objects.create(**data)
                     instance.save()
-                    return JsonResponse({"_meta":{"message":str(instance)+" Creada con exito"},"item":clear_view(self.model,serialize(instance),request.user)})
+                    data["item"]=clear_view(self.model,serialize(instance),request.user)
+                    self.middleware("post",request,data)
+
+                    return JsonResponse({"_meta":{"message":str(instance)+" Creada con exito"},"item":data["item"]})
 
             else:
                 return JsonResponse({"_meta":{"message":" No se proporcionaron los datos para crear el registro"},"item":None})

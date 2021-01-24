@@ -37,6 +37,31 @@ class Media(ResourceViewRest):
                         "width": 150
                     }
                     }
+        if view=="post":
+            url,ext=os.path.splitext(data["item"]["guid"])
+            data["item"]["filesizeHumanReadable"]="97 KB"
+            data["item"]["filesizeInBytes"]=0
+            if data["mime_type"].lower() in ["image/jpeg","image/jpg","image/png","image/gif","image/bmp"]:
+                
+                    data["item"]["sizes"]={ 
+                    "full":{
+                        "height": 600,
+                        "orientation": "landscape",
+                        "url":  url+"_600-600"+ext,
+                        "width": 600},
+                    "medium":{
+                        "height": 300,
+                        "orientation": "landscape",
+                        "url":url+"_300-300"+ext,
+                        "width": 300
+                        },
+                    "thumbail":{
+                        "height": 150,
+                        "orientation": "landscape",
+                        "url": url+"_150-150"+ext,
+                        "width": 150
+                    }
+                    }
                     
 
 class Plugin(ResourceViewRest):

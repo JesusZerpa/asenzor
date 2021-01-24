@@ -147,7 +147,7 @@ def install(request):
 		else:
 			return render(request,"asenzor/install.html",locals())
 	elif request.method=="POST":
-		if request.user.is_autenticated:
+		if request.user.is_authenticated:
 
 			main_site=request.POST.get("main_site")
 			site_description=request.POST.get("site_description")
@@ -176,7 +176,15 @@ def install(request):
 
 			return HttpResponseRedirect(settings.ASENZOR_URL)
 		else:
-			return HttpResponse("Necesitas tener un usuario primero, prueba ejecutar python manage.py createsuperuser")
+			from django.template import Template, Context
+			user=User.objects.first()
+			t = Template("""Necesitas estar logeado,{{message}}  o accede a  
+			 <a href="{{url}}">Login</a>""")
+			c = Context({
+				"url":settings.BASE_URL+"admin/",
+				"message":"prueba ejecutar: python manage.py createsuperuser y luego " if not user else ""	})
+			return HttpResponse(t.render(c))
+
 
 class CustomizeUser(ResourceView):
 	"""docstring for Pages"""

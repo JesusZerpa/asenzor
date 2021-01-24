@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User, Group,Permission
 from datetime import datetime
+from django.utils import timezone
 import jsonfield,json
 
 # Create your models here.
@@ -40,7 +41,7 @@ class Post(models.Model):
 	comment_status=models.CharField(max_length=250,null=True,blank=True)
 	ping_status=models.CharField(max_length=250,null=True,blank=True)
 	password=models.CharField(max_length=250,null=True,blank=True)
-	modified=models.DateTimeField(max_length=250,default=datetime.now)
+	modified=models.DateTimeField(max_length=250,default= timezone.now)
 	content_filtered=models.TextField(max_length=250,blank=True,null=True)
 	parent=models.ForeignKey("self",on_delete=models.CASCADE,blank=True,null=True)
 	guid=models.CharField(max_length=250,unique=True)
