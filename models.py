@@ -288,6 +288,7 @@ class Option(models.Model):
 		try:
 			if site==None:
 				site=Site.get_master()
+			print("eeeeeeeee",value)
 			instance=cls.objects.get(name=key,site=site,encrypted=encrypted)
 			setattr(instance,key,value)
 			

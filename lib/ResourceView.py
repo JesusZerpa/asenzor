@@ -443,22 +443,23 @@ class ResourceView(object):
             
             locals()["form"]=locals()["form"](None,request.POST,request.FILES)
           
-            
+            d=data
             if locals()["form"].is_valid():
 
                 instance=locals()["form"].save()
+                d["instance"]=instance
                 for action in actions:
                     action.send(request,object=instance)
+                self.middleware("new",request,d)
                 return HttpResponseRedirect(self.new_redirect)
-
-            d=data
-            d["action"]=self.new_action 
-            d["instance"]=instance
-            d["novalidate"]=self.new_novalidate
-            d.update(self.custom_data["new"])
-            d.update(locals())
-            self.middleware("new",request,d)
-            return render(request,self.new_template,d)
+            else:
+                d["action"]=self.new_action 
+                
+                d["novalidate"]=self.new_novalidate
+                d.update(self.custom_data["new"])
+                d.update(locals())
+                self.middleware("new",request,d)
+                return render(request,self.new_template,d)
         elif request.method=="GET"  and request.method in methods:
             locals()["title"]=self.title_new if "title" not in data else data["title"]
             self.generate_data(request,"new",locals(),model=model,choices=choices)

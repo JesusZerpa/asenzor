@@ -111,9 +111,10 @@ class Options(ResourceView):
 	def middleware(cls,view,request,data,id=None):
 		from django.apps import apps
 		asenzor=apps.get_app_config("asenzor")
-		if request.method=="POST" and (view=="create" or view=="edit"):
+		print("uuuuuuuuu",view,request.method)
+		if request.method=="POST" and (view=="new" or view=="edit"):
 			
-			
+			print("fffffffffffff",data["instance"].encrypted)
 			if data["instance"].encrypted:
 				data["instance"].value=asenzor.encode(data["instance"].value,asenzor.get_secret_key())
 				data["instance"].save()
