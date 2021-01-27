@@ -48,7 +48,7 @@ class Pages(ResourceView):
 			try:
 				data["post"]["content"]=json.loads(data["post"]["content"])
 				data_content=True
-				if data["post"]["content"]==None:
+				if data["post"]["content"]==None or data["post"]["content"]=="":
 					data["post"]["content"]=asenzor.serialize_template_admin_settings(template,request) 
 			except:
 				pass

@@ -90,7 +90,10 @@
           </div>
          
           <div v-for="(image, key) in images" class="file-listing" style="display: inline-block;">
-            <div>
+            <div style="
+            background-image: url('/static/img/tiles-transparent.jpg');
+
+            ">
        
                <img class="preview" 
                  style="
@@ -98,7 +101,7 @@
                  height: 80px;
                  object-fit: contain;
                  "
-                 v-if="search=='' || image.title.indexOf(search)>-1 "
+                 v-if="search=='' || image.name.toLowerCase().indexOf(search.toLowerCase())>-1 "
                  :key="image.id"
                  :id="image.id"
                  :ref="'media_'+image.id"
@@ -107,7 +110,7 @@
                  :description='image.description'
                  :src="'{{ MEDIA_URL }}'+image.sizes.thumbail.url"
                  loading="lazy"
-                 @click="select('media_'+image.id)">
+                 @click="select($event,'media_'+image.id)">
               <progress max="100" :value.prop="uploadPercentage" hidden=""></progress>
             </div>
            
@@ -122,8 +125,12 @@
         </div>
         <div class="col-md-4" style="overflow: scroll;">
           <div v-if="active" >
-
-          <img :src="'{{BASE_URL}}media/'+active.src" style="max-width: 280px">
+            <div style="
+            background-image: url('/static/img/tiles-transparent.jpg');
+            ">
+            <img :src="'{{BASE_URL}}media/'+active.src" style="max-width: 280px">    
+            </div>
+          
           <span style="color:blue;cursor:pointer" @click="edit()">Editar Imagen</span>
           <span style="color:red;cursor:pointer" @click="remove()">Borrar Permanentemente</span>
   

@@ -19,7 +19,8 @@ class Media(VuePy):
                 "desmark":[],#los que estan en gris
                 "mediatabs":self.mediatabs,
                 "active":None,
-                "search":""
+                "search":"",
+                "resources":[]
                  }
 
 
@@ -114,6 +115,7 @@ class Media(VuePy):
                 "description":elem["content"],
                 "sizes":elem["sizes"]})
         self.vue.images=files 
+        self.vue.resources=files
 
 
 
@@ -176,7 +178,7 @@ class Media(VuePy):
         src=item["guid"]
         del item["guid"]
         item["src"]=src
-        self.vue.images.push(item)
+        self.vue.images.unshift(item)
 
 
         if s(self.vue["$refs"]["tab1"]).hasClass("active"):
@@ -199,8 +201,9 @@ class Media(VuePy):
         self.vue.selected=[]
         self.vue.desmark=[]
         for elem in dict(self.vue["$refs"]).keys():
-            if elem.startswith("slide_"):
-                self.vue["$refs"][elem][0].style.border="inherit"
+            if elem.startswith("media_"):
+                if len(self.vue ['$refs'][elem]):
+                    self.vue["$refs"][elem][0].style.border="none"
     def remove(self):
         pass
 
@@ -234,28 +237,73 @@ class Media(VuePy):
     def edited(self,data):
         pass
 
-    def select(self,name):
+    def select(self,event,name):
 
         
 
         if not self.single:
-            if self.vue.selected.includes(name):
-                self.vue["$refs"][name][0].style.border="solid 2px gray"
+            console.log( len(self.vue.selected)==0 or event.ctrlKey, len(self.vue.selected)==0 , event.ctrlKey)
+            if len(self.vue.selected)==0 or event.ctrlKey:
+                console.log("sssss")
+                if self.vue.selected.includes(name):
+                    self.vue["$refs"][name][0].style.border="solid 2px gray"
 
-                i=self.vue.selected.indexOf(name)
-                self.vue.selected.splice(i,1)
-                if not self.vue.desmark.includes(name):
-                    self.vue.desmark.push(name)
+                    i=self.vue.selected.indexOf(name)
+                    self.vue.selected.splice(i,1)
+                    if not self.vue.desmark.includes(name):
+                        self.vue.desmark.push(name)
 
-            elif self.vue.desmark.includes(name):
-                self.vue["$refs"][name][0].style.border="inherit"
-                i=self.vue.desmark.indexOf(name)
-                self.vue.desmark.splice(i,1)
+                elif self.vue.desmark.includes(name):
+                    self.vue["$refs"][name][0].style.border="inherit"
+                    i=self.vue.desmark.indexOf(name)
+                    self.vue.desmark.splice(i,1)
 
+                else:
+                    self.vue["$refs"][name][0].style.border="solid 2px blue"
+                    self.vue.selected.push(name)
+                    self.vue.active=self.activate(self.getdata(self.vue["$refs"][name][0].id))
+            elif event.shiftKey:
+                start=self.vue.selected.slice(-1)[0]
+                slug,id=name.split("_")
+
+                if int(id)>int(start.split("_")[1]):
+                    newid=start.split("_")[1]
+                    console.log("tttttt",int(newid),int(id))
+                    while int(newid)<=int(id):
+                        self.vue["$refs"][f"media_{newid}"][0].style.border="solid 2px bue"
+                        
+                        if not self.vue.selected.includes(f"media_{newid}"):
+                            self.vue.selected.push(f"media_{newid}")
+                            if self.vue.desmark.includes(f"media_{newid}"):
+                                i=self.vue.desmark.indexOf(name)
+                                self.vue.desmark.splice(i,1)
+
+                        newid+=1
+                else:
+                    newid=start.split("_")[1]
+                    #aqui puedo colocar que los recorra primero para saber si todos 
+                    #estan en azul y luego desactivarlos
+                    #-------------------
+                    #aqui recorre a todos y los activa
+                    while int(newid)>=int(id):
+                        self.vue["$refs"][f"media_{newid}"][0].style.border="solid 2px blue"
+                        if not self.vue.selected.includes(f"media_{newid}"):
+                            self.vue.selected.push(f"media_{newid}")
+                            if self.vue.desmark.includes(f"media_{newid}"):
+                                i=self.vue.desmark.indexOf(name)
+                                self.vue.desmark.splice(i,1)
+                        newid-=1
             else:
+                for elem in dict(self.vue["$refs"]).keys():
+                    console.log("rrrr",elem)
+                    if elem.startswith("media_"):
+                        if len(self.vue["$refs"][elem]):
+                            self.vue["$refs"][elem][0].style.border="none"
                 self.vue["$refs"][name][0].style.border="solid 2px blue"
-                self.vue.selected.push(name)
-                self.vue.active=self.activate(self.getdata(self.vue["$refs"][name][0].id))
+                self.vue.selected=[name]
+                self.vue.desmark=[]
+            self.vue.active=self.activate(self.getdata(self.vue["$refs"][name][0].id))
+        
         elif self.single:
             if len(list(self.vue.selected))==0:
                 self.vue.selected.push(name)
@@ -280,6 +328,8 @@ class Media(VuePy):
                 return img
     def activate(self,data):
         return data
+
+
 
 
     def accept(self):

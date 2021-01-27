@@ -4,6 +4,7 @@ from .asenzor.py.media import Media
 from .asenzor.py.edit import Edit
 from .asenzor.py.plugins import Plugins
 from .asenzor.py.support import Support
+
 element=require("element-ui")["default"]
 if document.querySelector("#table_app"):
 	window.table=Table().mount("#table")
@@ -17,10 +18,8 @@ if document.querySelector("#install_plugins"):
 if document.querySelector("#support_app"):
 	window.plugins=Support().mount("#support")
 	window.table=Table().mount("#table")
-
 def sticky():
     altura = s('.navbar').offset().top;
-    
     def switch():
         if ( s(window).scrollTop() > altura ):
             s('.navbar').addClass('navbar-fixed');

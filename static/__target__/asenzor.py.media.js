@@ -1,4 +1,4 @@
-// Transcrypt'ed from Python, 2021-01-24 19:43:41
+// Transcrypt'ed from Python, 2021-01-27 02:20:44
 var re = {};
 import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __proxy__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 import * as __module_re__ from './re.js';
@@ -13,7 +13,7 @@ export var Media =  __class__ ('Media', [VuePy], {
 	mediatabs: 0,
 	active: null,
 	get data () {return __get__ (this, function (self) {
-		return dict ({'images': [], 'dragAndDropCapable': false, 'files': [], 'uploadPercentage': 0, 'selected': [], 'desmark': [], 'mediatabs': self.mediatabs, 'active': null, 'search': ''});
+		return dict ({'images': [], 'dragAndDropCapable': false, 'files': [], 'uploadPercentage': 0, 'selected': [], 'desmark': [], 'mediatabs': self.mediatabs, 'active': null, 'search': '', 'resources': []});
 	});},
 	get determineDragAndDropCapable () {return __get__ (this, function (self) {
 		var div = document.createElement ('div');
@@ -56,6 +56,7 @@ export var Media =  __class__ ('Media', [VuePy], {
 			files.append (dict ({'src': elem ['guid'], 'id': elem ['id'], 'alternative': '', 'title': (elem ['title'] ? elem ['title'] : ''), 'name': elem ['name'], 'author': elem ['author'] ['username'], 'description': elem ['content'], 'sizes': elem ['sizes']}));
 		}
 		self.vue.images = files;
+		self.vue.resources = files;
 	});},
 	get getImagePreviews () {return __get__ (this, function (self) {
 		var i = 0;
@@ -88,7 +89,7 @@ export var Media =  __class__ ('Media', [VuePy], {
 		var src = item ['guid'];
 		delete item ['guid'];
 		item ['src'] = src;
-		self.vue.images.push (item);
+		self.vue.images.unshift (item);
 		if ($ (self.vue ['$refs'] ['tab1']).hasClass ('active')) {
 			$ (self.vue ['$refs'] ['tab1']).removeClass ('active show');
 		}
@@ -110,8 +111,10 @@ export var Media =  __class__ ('Media', [VuePy], {
 		self.vue.selected = [];
 		self.vue.desmark = [];
 		for (var elem of dict (self.vue ['$refs']).py_keys ()) {
-			if (elem.startswith ('slide_')) {
-				self.vue ['$refs'] [elem] [0].style.border = 'inherit';
+			if (elem.startswith ('media_')) {
+				if (len (self.vue ['$refs'] [elem])) {
+					self.vue ['$refs'] [elem] [0].style.border = 'none';
+				}
 			}
 		}
 	});},
@@ -142,26 +145,79 @@ export var Media =  __class__ ('Media', [VuePy], {
 	get edited () {return __get__ (this, function (self, data) {
 		// pass;
 	});},
-	get select () {return __get__ (this, function (self, py_name) {
+	get select () {return __get__ (this, function (self, event, py_name) {
 		if (!(self.single)) {
-			if (self.vue.selected.includes (py_name)) {
-				self.vue ['$refs'] [py_name] [0].style.border = 'solid 2px gray';
-				var i = self.vue.selected.indexOf (py_name);
-				self.vue.selected.splice (i, 1);
-				if (!(self.vue.desmark.includes (py_name))) {
-					self.vue.desmark.push (py_name);
+			console.log (len (self.vue.selected) == 0 || event.ctrlKey, len (self.vue.selected) == 0, event.ctrlKey);
+			if (len (self.vue.selected) == 0 || event.ctrlKey) {
+				console.log ('sssss');
+				if (self.vue.selected.includes (py_name)) {
+					self.vue ['$refs'] [py_name] [0].style.border = 'solid 2px gray';
+					var i = self.vue.selected.indexOf (py_name);
+					self.vue.selected.splice (i, 1);
+					if (!(self.vue.desmark.includes (py_name))) {
+						self.vue.desmark.push (py_name);
+					}
+				}
+				else if (self.vue.desmark.includes (py_name)) {
+					self.vue ['$refs'] [py_name] [0].style.border = 'inherit';
+					var i = self.vue.desmark.indexOf (py_name);
+					self.vue.desmark.splice (i, 1);
+				}
+				else {
+					self.vue ['$refs'] [py_name] [0].style.border = 'solid 2px blue';
+					self.vue.selected.push (py_name);
+					self.vue.active = self.activate (self.getdata (self.vue ['$refs'] [py_name] [0].id));
 				}
 			}
-			else if (self.vue.desmark.includes (py_name)) {
-				self.vue ['$refs'] [py_name] [0].style.border = 'inherit';
-				var i = self.vue.desmark.indexOf (py_name);
-				self.vue.desmark.splice (i, 1);
+			else if (event.shiftKey) {
+				var start = self.vue.selected.slice (-(1)) [0];
+				var __left0__ = py_name.py_split ('_');
+				var slug = __left0__ [0];
+				var id = __left0__ [1];
+				if (int (id) > int (start.py_split ('_') [1])) {
+					var newid = start.py_split ('_') [1];
+					console.log ('tttttt', int (newid), int (id));
+					while (int (newid) <= int (id)) {
+						self.vue ['$refs'] ['media_{}'.format (newid)] [0].style.border = 'solid 2px bue';
+						if (!(self.vue.selected.includes ('media_{}'.format (newid)))) {
+							self.vue.selected.push ('media_{}'.format (newid));
+							if (self.vue.desmark.includes ('media_{}'.format (newid))) {
+								var i = self.vue.desmark.indexOf (py_name);
+								self.vue.desmark.splice (i, 1);
+							}
+						}
+						newid++;
+					}
+				}
+				else {
+					var newid = start.py_split ('_') [1];
+					while (int (newid) >= int (id)) {
+						self.vue ['$refs'] ['media_{}'.format (newid)] [0].style.border = 'solid 2px blue';
+						if (!(self.vue.selected.includes ('media_{}'.format (newid)))) {
+							self.vue.selected.push ('media_{}'.format (newid));
+							if (self.vue.desmark.includes ('media_{}'.format (newid))) {
+								var i = self.vue.desmark.indexOf (py_name);
+								self.vue.desmark.splice (i, 1);
+							}
+						}
+						newid--;
+					}
+				}
 			}
 			else {
+				for (var elem of dict (self.vue ['$refs']).py_keys ()) {
+					console.log ('rrrr', elem);
+					if (elem.startswith ('media_')) {
+						if (len (self.vue ['$refs'] [elem])) {
+							self.vue ['$refs'] [elem] [0].style.border = 'none';
+						}
+					}
+				}
 				self.vue ['$refs'] [py_name] [0].style.border = 'solid 2px blue';
-				self.vue.selected.push (py_name);
-				self.vue.active = self.activate (self.getdata (self.vue ['$refs'] [py_name] [0].id));
+				self.vue.selected = [py_name];
+				self.vue.desmark = [];
 			}
+			self.vue.active = self.activate (self.getdata (self.vue ['$refs'] [py_name] [0].id));
 		}
 		else if (self.single) {
 			if (len (list (self.vue.selected)) == 0) {

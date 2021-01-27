@@ -4,15 +4,9 @@ import os,json,threading,time,subprocess,sys
 from datetime import datetime,timedelta
 from copy import copy
 from uuid import uuid4
+import subprocess
 import json
-def show_proc(proc):
-    #stdout_value = proc.communicate()[0].decode('utf-8')
-    while True:
-        
-        line = proc.stdout.readline().strip()
-        if line:
-            print(line.decode("utf-8"))
-        
+
 
 def get_process():
     proc = subprocess.Popen(
@@ -121,17 +115,21 @@ class AppConfig(AppConfig):
                 "filename": "[name].js"
             }
         },
-        "secret_key":uuid4()
+    
     }
 
-    can_compile=True
+    compile=[]
     _checked_block=False
 
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         if os.path.exists(self.name+'/settings.json'):
             with open(self.name+'/settings.json') as f:
-                self.settings=json.loads(f.read())
+                settings=f.read()
+                if settings:
+                    self.settings=json.loads(settings)
+
+
 
         self.settings["webpack"]["output"]["path"]=os.path.abspath("./"+self.name+'/static/'+self.name+'/dist/')
         self.loadeds=[]
@@ -264,7 +262,7 @@ class AppConfig(AppConfig):
             process=f.read()
         with open(self.name+"/.block","w") as f:
             f.write(process+str(proc.pid)+"\n")
-        
+    ''' 
     def webpack(self):
         """
         Dada el nombre de la aplicacion se procede a crear el archivo de mezcla 
@@ -293,13 +291,15 @@ class AppConfig(AppConfig):
                 thread=threading.Thread(target=show_proc,args=(proc,))
                 self.threads.append(thread)
                 thread.start()
-            
-
+    '''
+    
+    """
     def sass(self,path=""):
         if sys.argv[1]=="runserver":
             def sass_compile():
                 if settings.DEBUG and self.can_compile:
                     print("compilando sass...")
+            
                     import subprocess
                     proc = subprocess.Popen(
                         ['cd '+self.name+'/static/'+path+' && sass --watch sass:css'],
@@ -314,6 +314,33 @@ class AppConfig(AppConfig):
                 thread=threading.Thread(target=show_proc,args=(proc,))
                 self.threads.append(thread)
                 thread.start()
+    """
+    def sass(self,path=""):
+        if sys.argv[1]=="runserver":
+            def sass_compile():
+                if settings.DEBUG and self.can_compile:
+                    print("compilando sass...")
+                    lastmodified=os.stat(self.name+'/static/'+path).st_mtime
+                    while True:
+                        if lastmodified!=os.stat(self.name+'/static/'+path).st_mtime:
+                            import subprocess
+                            proc = subprocess.Popen(
+                                ['cd '+self.name+'/static/'+path+' && sass --watch sass:css'],
+                                shell=True,
+                                stdout=subprocess.PIPE,
+                            )
+                            lastmodified=os.stat(self.name+'/static/'+path).st_mtime
+                        time.sleep(1)
+
+                    self.register_process(proc)
+                    #return proc
+            """
+            if not self.is_blocked('cd '+self.name+'/static/'+path+' && sass --watch sass:css'):
+                #proc=sass_compile()
+            """ 
+            thread=threading.Thread(target=sass_compile)
+            self.threads.append(thread)
+            thread.start()
     def register_template(self,path,options,overwrite=False):
         """
         Este metodo esta pensado para los posts de paginas las cuales se les

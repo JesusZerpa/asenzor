@@ -1,10 +1,10 @@
 <div>
-	<draggable v-model="menu" tag="transition-group" item-key="id" @change="change">
+	<draggable v-model="menu" tag="transition-group2" item-key="id" @change="change">
 	<div v-for="tag in menu" :key="tag.id" v-if="renderComponent">
 		[[tag.id]]
 		<input type="checkbox" name="" :id="tag.id" v-model="tag.checked">
-		<label>Nombre</label><input type="" name="" v-model="tag.name">
-		<label>Link</label><input type="" name="" v-model="tag.link">
+		<label>Nombre</label><input type="" name="" v-model="tag.name" @change="change">
+		<label>Link</label><input type="" name="" v-model="tag.link" @change="change">
 	</div>
 	</draggable>
 	<button class="btn btn-success" @click="add()">+</button>

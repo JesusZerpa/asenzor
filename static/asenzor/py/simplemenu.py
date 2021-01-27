@@ -43,5 +43,6 @@ class SimpleMenu(VuePy):
         self.vue["$root"].update_content({self.vue["$attrs"]["name"]:self.vue["menu"]})
 
     def change(self):
+        console.log("&&&&&&&&&",self.vue["$root"])
         self.vue["$root"].update_content({self.vue["$attrs"]["name"]:self.vue["menu"]})
 

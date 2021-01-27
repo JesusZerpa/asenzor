@@ -9,7 +9,7 @@ module.exports = {
     devtool: 'inline-source-map',
     context: __dirname,
     entry: settings.webpack.entry,
-    mode:"production",//"development","production"
+    mode:"development",//"development","production"
     output: settings.webpack.output,
    module:{
    	rules: [

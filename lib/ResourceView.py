@@ -943,6 +943,7 @@ class ResourceViewRest(ResourceView):
             data.update(filters)
             items=[clear_view(self.model,serialize(item),request.user) for item in self.model.objects.filter(**data)]
             data["items"]=items
+            
             self.middleware("search",request,data)
             return JsonResponse({
                 "_meta":{"message":f"{len(items)} resultados"},
@@ -995,8 +996,26 @@ class ResourceViewRest(ResourceView):
 
                     data=self.uploaded(request,data,files)
                 if self.model:
+               
+                    if "name" not in data:
+                        name=data["title"].lower()
+                    else:
+                        name=data["name"]
+                    newname=name
+                    c=1
+                    while True:
+                        try:
+                            self.model.objects.get(name=newname)
+                            newname=data["name"]+f"-{c}"
+                            c+=1
+                        except Exception as e:
+                            break
+                    
+                    data["name"]=newname
+                    data["guid"]=newname
+                    print("ccccccc",data)
                     instance=self.model.objects.create(**data)
-                    instance.save()
+                    #instance.save()
                     data["item"]=clear_view(self.model,serialize(instance),request.user)
                     self.middleware("post",request,data)
 
@@ -1118,7 +1137,7 @@ class ResourceViewRest(ResourceView):
             
             data=self.handle_uploaded_file(path,request.FILES[file])
         
-            files.append({"name":data["name"],"url":datedir+data["name"],"mime_type":data["mime_type"]}) 
+            files.append({"name":datedir.replace("/","_")+data["name"],"url":datedir+data["name"],"mime_type":data["mime_type"]}) 
         
         if len(files)>1:
             return files

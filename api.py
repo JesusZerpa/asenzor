@@ -8,8 +8,8 @@ class Media(ResourceViewRest):
     filter={"type":"attachment"}
     def middleware(self,view,request,data):
         if view=="search":
-           
             for elem in data["items"]:
+
                 author=serialize(User.objects.get(id=elem["author"]),["email","id","username"])
                 elem["author"]=author                
                 url,ext=os.path.splitext(elem["guid"])
@@ -17,7 +17,7 @@ class Media(ResourceViewRest):
                 elem["filesizeInBytes"]=0
                 
                 if elem["mime_type"].lower() in ["image/jpeg","image/jpg","image/png","image/gif","image/bmp"]:
-                
+
                     elem["sizes"]={ 
                     "full":{
                         "height": 600,
@@ -37,10 +37,13 @@ class Media(ResourceViewRest):
                         "width": 150
                     }
                     }
+            data["items"].reverse()
+
         if view=="post":
             url,ext=os.path.splitext(data["item"]["guid"])
             data["item"]["filesizeHumanReadable"]="97 KB"
             data["item"]["filesizeInBytes"]=0
+
             if data["mime_type"].lower() in ["image/jpeg","image/jpg","image/png","image/gif","image/bmp"]:
                 
                     data["item"]["sizes"]={ 
