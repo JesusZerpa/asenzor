@@ -4,8 +4,14 @@ from .asenzor.py.media import Media
 from .asenzor.py.edit import Edit
 from .asenzor.py.plugins import Plugins
 from .asenzor.py.support import Support
+from .asenzor.py.vuepy import Vue
 
-element=require("element-ui")["default"]
+element=require("element-ui")
+
+element.locale("en")
+Vue.use(element)
+
+
 if document.querySelector("#table_app"):
 	window.table=Table().mount("#table")
 	window.toolbar=ToolBar().mount("#toolbar")

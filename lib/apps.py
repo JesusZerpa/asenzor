@@ -418,8 +418,10 @@ class AppConfig(AppConfig):
                         page[option][elem.name]=elem.render_settings(request)
                             
                     elif elem["type"] in dir(forms):
-                        widget=getattr(forms,elem["type"])()
-                        widget.attrs.update(elem["options"] if "options" in elem else {})
+    
+                        widget=getattr(forms,elem["type"])(attrs=elem["options"] if "options" in elem else {})
+
+                        
                         widget.attrs["name"]=option+"."+elem["name"]
                         value=""
                         if post:
@@ -436,6 +438,7 @@ class AppConfig(AppConfig):
                         page[option][elem["name"]]=widget.render(option+"."+elem["name"],value)
 
                     elif elem["type"] in dir(asenzor.widgets):
+                        
                         widget=getattr(asenzor.widgets,elem["type"])()
                         widget.attrs.update(elem["options"] if "options" in elem else {})
                         widget.attrs["name"]=option+"."+elem["name"]
@@ -449,16 +452,16 @@ class AppConfig(AppConfig):
                         else:
                             if "value" in elem:
                                 value=elem["value"]
-                            
-                                
+               
                         widget.attrs["value"]=value
+                        
                         page[option][elem["name"]]=widget.render(option+"."+elem["name"],value)
 
                     elif elem["type"] in widgets:
                         widget=getattr(widgets,elem["type"])()
                         widget.attrs.update(elem["options"] if "options" in elem else {})
                         widget.attrs["name"]=option+"."+elem["name"]
-
+                        
                         value="" 
                         if post:
                             

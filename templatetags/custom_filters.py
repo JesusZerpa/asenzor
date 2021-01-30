@@ -138,7 +138,7 @@ def show_proc(proc):
         line = proc.stdout.readline().strip()
         if line:
             print(line.decode("utf-8"))
-def watch(command,app,exclude,date):
+def watch(command,app,exclude,date,type):
     import json
     for root, dirs, files in os.walk(app.name+"/static/"):
         for name in files:
@@ -147,19 +147,21 @@ def watch(command,app,exclude,date):
                 if os.path.isfile(os.path.join(root, name)):
                  
                     if datetime.fromtimestamp(os.stat(os.path.join(root, name)).st_mtime)>date:
+                        if ((name.endswith(".py") or name.endswith(".js")) and type=="webpack") \
+                            or (name.endswith(".scss") and type=="sass"):
                     
-                        with open(app.name+'/settings.json',"w") as f:
-                            f.write(json.dumps(app.settings,indent=2))
-                            
-                        proc = subprocess.Popen(
-                            [command],
-                            shell=True,
-                            stdout=subprocess.PIPE,
-                        )
-                        output=proc.communicate()
-                        if output:
-                            print(output[0].decode("utf-8"))
-                        date=datetime.now()
+                            with open(app.name+'/settings.json',"w") as f:
+                                f.write(json.dumps(app.settings,indent=2))
+                                
+                            proc = subprocess.Popen(
+                                [command],
+                                shell=True,
+                                stdout=subprocess.PIPE,
+                            )
+                            output=proc.communicate()
+                            if output:
+                                print(output[0].decode("utf-8"))
+                            date=datetime.now()
                         
 
                 
@@ -190,10 +192,10 @@ def compile():
                         app=apps.get_app_config(elem)
                         if "webpack" in app.compile:
                       
-                            watch('cd '+app.name+'/static/ && npx webpack --config webpack.config.js ',app,exclude,date)
+                            watch('cd '+app.name+'/static/ && npx webpack --config webpack.config.js ',app,exclude,date,"webpack")
                         if "sass" in app.compile:
                       
-                            watch('cd '+self.name+'/static/'+path+' && sass --watch sass:css',app,exclude,date)
+                            watch('cd '+app.name+'/static/'+app.name+' && sass --watch sass:css',app,exclude,date,"sass")
                             
                                 
                         

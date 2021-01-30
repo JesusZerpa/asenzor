@@ -5,6 +5,7 @@ from .asenzor.py.tiny import TinyEditor
 from .asenzor.py.video import Video
 from .asenzor.py.simplemenu import SimpleMenu
 from .asenzor.py.embeded import Embeded
+from .asenzor.py.colorpicker import Color
 
 #element=require("element-ui")
 
@@ -15,13 +16,14 @@ window.VUE_COMPONENTS["asenzor"]["image-select"]=ImageSelect().__component__
 window.VUE_COMPONENTS["asenzor"]["video-widget"]=Video().__component__
 window.VUE_COMPONENTS["asenzor"]["simple-menu"]=SimpleMenu().__component__
 window.VUE_COMPONENTS["asenzor"]["embeded"]=Embeded().__component__
+window.VUE_COMPONENTS["asenzor"]["color"]=Color().__component__
 
 Vue=require("vue")["default"]
 
 
 class Edit(VuePy):
     """docstring for MyAoo"""   
-    methods=["publish","save","update_from_widget","update_content","get_content"]
+    methods=["publish","save","update_from_widget","update_content","get_content","get_by_type"]
     components=window.VUE_COMPONENTS["asenzor"]
     content=""
     js_type=None
@@ -36,6 +38,11 @@ class Edit(VuePy):
     def created(self):
         window.edit=self.vue
     def data(self):
+        models={}
+        for name,widget in self.get_by_type("Color").items():
+                if "v-model" in dict(widget["options"]).keys():
+                    models[widget["options"]["v-model"].split(".")[1]]=widget["value"]
+
         return {"content":window.DATA["post"]["content"] if window.DATA["post"] else "",
                 "title":window.DATA["post"]["title"] if window.DATA["post"] else "",
                 "status":None,
@@ -46,11 +53,16 @@ class Edit(VuePy):
                 "main_image":None,
                 "toogle":self.toogle,
                 "post_type":None,
-                "type":"post"}
+                "type":"post",
+                "models":models}
     def mounted(self):
-        
         self.vue["post_type"]=self.vue["$el"]["attributes"]["post_type"]["value"]
-      
+        if window.DATA["post"]["content"]:
+            console.log("wwwww",self.vue.get_by_type("Color"))
+            for name,widget in self.vue.get_by_type("Color").items():
+                if "v-model" in dict(widget["options"]).keys():
+                    self.vue.models[widget["options"]["v-model"]]=widget["value"]
+                    console.log("hhhh",self.vue.models[widget["options"]["v-model"]],widget["value"])
         self.vue.template=self.vue["$refs"]["template"].attributes["value"]["value"]
 
         for elem in dict(self.vue["$refs"]).keys():
@@ -90,17 +102,25 @@ class Edit(VuePy):
         console.log("iiii")
  
 
-    def update_from_widget(self,evt):
+    def update_from_widget(self,evt,value,name):
         """
         Este metodo de pruena esta diseñado para actualizar la informacion
         desde elementos de widgets normales de django, deberia usarse con @change
         """
-        console.log({
-            evt.target["name"]:evt.target.value
-            })
-        self.update_content({
-            evt.target["name"]:evt.target.value
-            })
+        if name:
+            console.log({
+                name:value
+                })
+            self.update_content({
+                name:value
+                })
+        else:
+            console.log({
+                evt.target["name"]:evt.target.value
+                })
+            self.update_content({
+                evt.target["name"]:evt.target.value
+                })
        
 
     async def publish(self):
@@ -198,9 +218,10 @@ class Edit(VuePy):
         s(document.body).append(node)
 
     def update_content(self,data):
-    
+     
         for elem,value in dict(data).items():
             name=elem.split(".")
+         
             if len(name)==2:
                 self.vue.content[name[0]][name[1]]["value"]=value
             elif len(name)==3:
@@ -215,4 +236,14 @@ class Edit(VuePy):
                 return DATA["post"]["content"][name[0]][name[1]]["value"][name[2]]
         else:
             return None
+    def get_by_type(self,type):
+        components={}  
+        if DATA["post"] and DATA["post"]["content"]:  
+            for elem in dict(DATA["post"]["content"]).keys():
+                
+                for elem2 in dict(DATA["post"]["content"][elem]).keys():
+                    if type==DATA["post"]["content"][elem][elem2]["type"]:
+                        components[elem+"."+elem2]=DATA["post"]["content"][elem][elem2]
+                   
+        return components
 app=Edit()

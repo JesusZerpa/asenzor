@@ -176,6 +176,12 @@ class SimpleMenu(Widget):
     def render(self,name,value):
         return self.template_render("<simple-menu {% include 'asenzor/widgets/attrs.html'%}/>",name,value)
 
+class Color(Widget):
+    component="color-template"
+    component_template="asenzor/widgets/color.html"
+    def render(self,name,value):
+        return self.template_render("<el-color-picker {% include 'asenzor/widgets/attrs.html'%} show-alpha></el-color-picker/>",name,value)
+
 
 class TinyMCE(Widget):
     def render(self,name,value):
