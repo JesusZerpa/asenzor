@@ -1138,7 +1138,7 @@ class ResourceViewRest(ResourceView):
             
             data=self.handle_uploaded_file(path,request.FILES[file])
         
-            files.append({"name":datedir.replace("/","_")+data["name"],"url":datedir+data["name"],"mime_type":data["mime_type"]}) 
+            files.append({"name":datedir+data["name"],"url":datedir+data["name"],"mime_type":data["mime_type"]}) 
         
         if len(files)>1:
             return files

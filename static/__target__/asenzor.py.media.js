@@ -1,4 +1,4 @@
-// Transcrypt'ed from Python, 2021-01-27 02:20:44
+// Transcrypt'ed from Python, 2021-01-31 03:22:42
 var re = {};
 import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __proxy__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 import * as __module_re__ from './re.js';
@@ -149,7 +149,6 @@ export var Media =  __class__ ('Media', [VuePy], {
 		if (!(self.single)) {
 			console.log (len (self.vue.selected) == 0 || event.ctrlKey, len (self.vue.selected) == 0, event.ctrlKey);
 			if (len (self.vue.selected) == 0 || event.ctrlKey) {
-				console.log ('sssss');
 				if (self.vue.selected.includes (py_name)) {
 					self.vue ['$refs'] [py_name] [0].style.border = 'solid 2px gray';
 					var i = self.vue.selected.indexOf (py_name);
@@ -176,7 +175,6 @@ export var Media =  __class__ ('Media', [VuePy], {
 				var id = __left0__ [1];
 				if (int (id) > int (start.py_split ('_') [1])) {
 					var newid = start.py_split ('_') [1];
-					console.log ('tttttt', int (newid), int (id));
 					while (int (newid) <= int (id)) {
 						self.vue ['$refs'] ['media_{}'.format (newid)] [0].style.border = 'solid 2px bue';
 						if (!(self.vue.selected.includes ('media_{}'.format (newid)))) {
@@ -206,7 +204,6 @@ export var Media =  __class__ ('Media', [VuePy], {
 			}
 			else {
 				for (var elem of dict (self.vue ['$refs']).py_keys ()) {
-					console.log ('rrrr', elem);
 					if (elem.startswith ('media_')) {
 						if (len (self.vue ['$refs'] [elem])) {
 							self.vue ['$refs'] [elem] [0].style.border = 'none';
@@ -228,13 +225,15 @@ export var Media =  __class__ ('Media', [VuePy], {
 			else if (self.vue.selected.includes (py_name)) {
 				var i = self.vue.selected.indexOf (py_name);
 				self.vue.selected.splice (i, 1);
-				self.vue ['$refs'] [py_name] [0].style.border = 'inherit';
+				self.vue ['$refs'] [py_name] [0].style.border = 'none';
 			}
 			else {
 				self.vue.selected [0] = py_name;
 				for (var elem of dict (self.vue ['$refs']).py_keys ()) {
-					if (elem != py_name) {
-						self.vue ['$refs'] [py_name] [0].style.border = 'inherit';
+					if (elem.startswith ('media_')) {
+						if (elem != py_name) {
+							self.vue ['$refs'] [elem] [0].style.border = 'none';
+						}
 					}
 				}
 				self.vue ['$refs'] [py_name] [0].style.border = 'solid 2px blue';

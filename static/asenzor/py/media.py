@@ -238,13 +238,9 @@ class Media(VuePy):
         pass
 
     def select(self,event,name):
-
-        
-
         if not self.single:
             console.log( len(self.vue.selected)==0 or event.ctrlKey, len(self.vue.selected)==0 , event.ctrlKey)
             if len(self.vue.selected)==0 or event.ctrlKey:
-                console.log("sssss")
                 if self.vue.selected.includes(name):
                     self.vue["$refs"][name][0].style.border="solid 2px gray"
 
@@ -268,7 +264,6 @@ class Media(VuePy):
 
                 if int(id)>int(start.split("_")[1]):
                     newid=start.split("_")[1]
-                    console.log("tttttt",int(newid),int(id))
                     while int(newid)<=int(id):
                         self.vue["$refs"][f"media_{newid}"][0].style.border="solid 2px bue"
                         
@@ -295,7 +290,6 @@ class Media(VuePy):
                         newid-=1
             else:
                 for elem in dict(self.vue["$refs"]).keys():
-                    console.log("rrrr",elem)
                     if elem.startswith("media_"):
                         if len(self.vue["$refs"][elem]):
                             self.vue["$refs"][elem][0].style.border="none"
@@ -313,12 +307,13 @@ class Media(VuePy):
                 if self.vue.selected.includes(name):
                     i=self.vue.selected.indexOf(name)
                     self.vue.selected.splice(i,1)
-                    self.vue["$refs"][name][0].style.border="inherit"
+                    self.vue["$refs"][name][0].style.border="none"
                 else:
                     self.vue.selected[0]=name
                     for elem in dict(self.vue["$refs"]).keys():
-                        if elem!=name:
-                            self.vue["$refs"][name][0].style.border="inherit"
+                        if elem.startswith("media_"):
+                            if elem!=name:
+                                self.vue["$refs"][elem][0].style.border="none"
 
                     self.vue["$refs"][name][0].style.border="solid 2px blue"
                     self.vue.active=self.activate(self.getdata(self.vue["$refs"][name][0].id))
