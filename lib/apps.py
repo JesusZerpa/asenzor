@@ -415,7 +415,9 @@ class AppConfig(AppConfig):
                                     if type(value)!=str:
                                         value=json.dumps(value)
                                     elem.value[name]=value
-                        page[option][elem.name]=elem.render_settings(request)
+                                page[option][elem.name]=elem.render_settings(request)
+                        else:
+                            page[option][elem.name]=elem.render_settings(request)
                             
                     elif elem["type"] in dir(forms):
     
