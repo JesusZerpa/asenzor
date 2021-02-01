@@ -963,7 +963,6 @@ class ResourceViewRest(ResourceView):
                 data["id"]=id
                 return JsonResponse({"_meta":{"message":"Busqueda encontrada"},"item":clear_view(self.model,serialize(self.model.objects.get(**data)),request.user )})
             except Exception as e:
-                print("wwwwwww",e)
                 return JsonResponse({"_meta":{"message":"No se encontraron resultados","item":None}})
         return HttpResponse("Debe implementar el metodo 'index'")
     
@@ -1083,12 +1082,12 @@ class ResourceViewRest(ResourceView):
             if id==None:
                 id=int(data["id"])
             instance=self.model.objects.get(id=id)
-            
             self.middleware("patch",request,data)
             for elem in self.model._meta.get_fields():
                 if elem.name in data:
                     if type(elem)==models.ForeignKey and data[elem.name]!=None:
                         item=data[elem.name]
+
                         data[elem.name]=elem.related_model.objects.get(id=item)
                     elif type(elem)==models.ManyToManyField and data[elem.name]!=None:
                         items=data[elem.name]
@@ -1142,7 +1141,7 @@ class ResourceViewRest(ResourceView):
             
             data=self.handle_uploaded_file(path,request.FILES[file])
         
-            files.append({"name":datedir.replace("/","_")+data["name"],"url":datedir+data["name"],"mime_type":data["mime_type"]}) 
+            files.append({"name":datedir+data["name"],"url":datedir+data["name"],"mime_type":data["mime_type"]}) 
         
         if len(files)>1:
             return files

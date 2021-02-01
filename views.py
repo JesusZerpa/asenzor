@@ -13,6 +13,10 @@ asenzor=apps.get_app_config('asenzor')
 @cache_page(0)
 @login_required
 def dashboard(request):
+	cards=[
+	{"title":"Bienvenido a ASENZOR",
+	 "message":"Tu panel de administración personalizado"}
+	]
 	return render(request,"asenzor/layouts/dashboard.html",locals())
 
 class Pages(ResourceView):
@@ -174,6 +178,15 @@ def install(request):
 			post2.save()
 			Option.update("frontpage",post.id)
 			Option.update("postpage",post2.id)
+			Option.update("smtp_server","smtp.gmail.com",description="Servidor de correo electronico")
+			Option.update("smtp_port","587")
+			Option.update("sender_email","asenzor@example.com",description="Correo desde donde se manada el mensaje")
+			Option.update("owner_email","asenzor@example.com",description="Correo al que se le manda el mensaje")
+			Option.update("smtp_password","",encrypted=True,description="Password del servidor de correo ")
+			Option.update("recaptcha_secret","",encrypted=True,description="Clave secreta de para formularios con recaptcha")
+			
+			
+			
 
 			return HttpResponseRedirect(settings.ASENZOR_URL)
 		else:

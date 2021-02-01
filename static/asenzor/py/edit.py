@@ -53,8 +53,13 @@ class Edit(VuePy):
                 "models":models}
     async def mounted(self):
         vue=self.vue
-        content=(await self.get_data())["post"]["content"] if (await self.get_data())["post"] else ""
-        title=(await self.get_data())["post"]["title"] if (await self.get_data())["post"] else ""
+        DATA=await self.get_data()
+        content=DATA["content"] if DATA["content"] else ""
+        if not content:
+            content={}
+        
+        vue.content=content
+        vue.title=DATA["title"] if DATA["title"] else ""
         color=(await vue.get_by_type("Color"))
         for name,widget in color.items():
                 if "v-model" in dict(widget["options"]).keys(): 
@@ -62,19 +67,19 @@ class Edit(VuePy):
                         vue.models[widget["options"]["v-model"].split(".")[1]]=widget["value"]
                     else:
                         console.error("v-model solo se permite bajo el formato models.[name-model]")
-        self.vue.template=TEMPLATE
-        for elem in dict(self.vue["$refs"]).keys():
+        vue.template=TEMPLATE
+        for elem in dict(vue["$refs"]).keys():
             if elem.startswith("toogle-"):
-                self.vue["$refs"][elem]
-                self.vue.toogle[elem]=True
+                vue["$refs"][elem]
+                vue.toogle[elem]=True
      
         """
         if self.vue.post_type=="custom":
             self.vue.content=
         """
         
-        self.vue.order=POST_ORDER
-        self.vue["type"]=(await self.get_data())["type"]
+        vue.order=POST_ORDER
+        vue["type"]=DATA["type"]
         """
         if self.vue["$refs"]["editor"]:
             console.log("dddddddd",self.vue["$refs"]["editor"]["$attrs"]["name"])
@@ -123,19 +128,20 @@ class Edit(VuePy):
        
 
     async def publish(self):
+        vue=self.vue
         form=__new__(FormData)()
-        form.append("title",self.vue.title)
-        form.append("type",self.vue["type"])
-        form.append("menu_order",self.vue.order)
+        form.append("title",vue.title)
+        form.append("type",vue["type"])
+        form.append("menu_order",vue.order)
         form.append("status","publish")
-        if window.DATA["post"]:
-            form.append("id",await self.get_data()["id"])
-        console.log("xxxxxx",self.vue.post_type)
-        if self.vue.post_type=="custom":
-            content=JSON.stringify(self.vue.content)
+        DATA=await self.get_data()
+        if DATA["post"]:
+            form.append("id",DATA["id"])
+        if vue.post_type=="custom":
+            content=JSON.stringify(vue.content)
             form.append("content",content)
         else:
-            form.append("content",self.vue.content)
+            form.append("content",vue.content)
         req=await fetch("/json/posts/",{
             "body":form,
             "method":"POST"
@@ -151,40 +157,35 @@ class Edit(VuePy):
         for elem in self.extra_data.keys():
             form.append(elem,self.extra_data[elem])
         form.append("post",post["id"])
-        form.append("template",self.vue.template)
+        form.append("template",vue.template)
 
         __pragma__("jsiter")
         req=await fetch("/json/postmeta/",{
             "body":form,
-            "method":"PATCH" if await self.get_data()["id"]!=js_undefined else "POST"
+            "method":"PATCH" if DATA["id"]!=js_undefined else "POST"
             })
         __pragma__("nojsiter")
 
     async def save(self):
-        alert("guardar")
+        vue=self.vue
         form=__new__(FormData)()
-        form.append("title",self.vue.title)
-        form.append("type",self.vue["type"])
-        form.append("menu_order",self.vue.order)
+        form.append("title",vue.title)
+        form.append("type",vue["type"])
+        form.append("menu_order",vue.order)
         form.append("status","trash")
         DATA=await self.get_data()
-        console.log("eeeeee",DATA)
         form.append("id",DATA["id"])
-        console.log("xxxxxx",self.vue.post_type)
-        if self.vue.post_type=="custom":
-            content=JSON.stringify(self.vue.content)
+        if vue.post_type=="custom":
+            content=JSON.stringify(vue.content)
             form.append("content",content)
         else:
-            form.append("content",self.vue.content)
-        
-        
-
-
+            form.append("content",vue.content)
+      
         req=await fetch("/json/posts/",{
             "body":form,
-            "method":"PATCH" if await self.get_data()["id"]!=js_undefined else "POST",
+            "method":"PATCH" if DATA["id"]!=js_undefined else "POST",
             })
-        console.log(req.status)
+        
         if req.status==200:
             await self.alert("Actualizado con exito")
         else:
@@ -193,15 +194,16 @@ class Edit(VuePy):
         post=data["item"]
        
         form=__new__(FormData)()
+
         for elem in self.extra_data.keys():
             form.append(elem,self.extra_data[elem])
         form.append("post",post["id"])
-        form.append("template",self.vue.template)
+        form.append("template",vue.template)
 
         __pragma__("jsiter")
         req=await fetch("/json/postmeta/",{
             "body":form,
-            "method":"PATCH" if await self.get_data()["id"]!=js_undefined else "POST"
+            "method":"PATCH" if DATA["id"]!=js_undefined else "POST"
             })
         __pragma__("nojsiter")
 
@@ -219,16 +221,18 @@ class Edit(VuePy):
         s(document.body).append(node)
 
     async def update_content(self,data):
+        vue=self.vue
+        console.log("aaaaaaa",vue)
         for elem,value in dict(data).items():
             name=elem.split(".")
             console.log([elem,value])
-            if self.vue.content:
-                if len(name)==2:
+     
+            if len(name)==2:
 
-                    self.vue.content[name[0]][name[1]]["value"]=value
-                elif len(name)==3:
-                    self.vue.content[name[0]][name[1]]["value"][name[2]]=value
-                    
+                vue.content[name[0]][name[1]]["value"]=value
+            elif len(name)==3:
+                vue.content[name[0]][name[1]]["value"][name[2]]=value
+                
     async def get_content(self,name):  
         DATA=await self.get_data()
         if DATA["content"]:  

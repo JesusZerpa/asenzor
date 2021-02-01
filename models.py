@@ -280,7 +280,7 @@ class Option(models.Model):
 			print(e)
 			return default
 	@classmethod		
-	def update(cls,key,value,site=None,encrypted=False):
+	def update(cls,key,value,site=None,encrypted=False,description=""):
 		if encrypted:
 			from django.apps import apps
 			asenzor=apps.get_app_config("asenzor")
@@ -288,9 +288,9 @@ class Option(models.Model):
 		try:
 			if site==None:
 				site=Site.get_master()
-			print("eeeeeeeee",value)
 			instance=cls.objects.get(name=key,site=site,encrypted=encrypted)
 			setattr(instance,key,value)
+			setattr(instance,"description",description)
 			
 
 		except :
@@ -299,6 +299,7 @@ class Option(models.Model):
 			elif site==None:
 				site=Site.get_master()
 			instance=cls.objects.create(name=key,value=value,encrypted=encrypted)
+			setattr(instance,"description",description)
 			instance.save()
 			return instance
 

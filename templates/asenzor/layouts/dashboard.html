@@ -86,13 +86,16 @@
   </div>
 </nav>
 	</header>
+
 {%block content%}
-<div>
+
+<div class="container" style="padding-top: 10px">
+
   {%for card in cards%}
     <div class="card" >
-     
+    
     <div class="card-header">
-      {{plugin.title}}   
+      {{card.title}}   
     </div>
     <div class="card-body">
       {{card.message}}
@@ -107,7 +110,7 @@
 
 
 	
-	
+
 
 
 </div>

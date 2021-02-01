@@ -65,7 +65,7 @@ class Media(ResourceViewRest):
                         "width": 150
                     }
                     }
-                    
+      
 
 class Plugin(ResourceViewRest):
     pass
