@@ -179,7 +179,7 @@ class ResourceView(object):
     btns=[]
     btns_show=[]
     warnings=[]
-    filter=None
+    filter={}
 
     actions=[{"label":"Editar","name":"edit","class":"btn btn-primary"},{"label":"Eliminar","name":"delete","class":"btn btn-danger"}]
     
@@ -849,9 +849,9 @@ class ResourceViewRest(ResourceView):
 
                 urlpatterns.append(path(self.slug+elem[0],csrf_exempt(getattr(self,elem[1]) )))
 
-        
+
         urlpatterns.append(path(self.slug,self.api,name=name))
-        urlpatterns.append(path(self.slug+"/<id>/",self.api,name=name))
+        urlpatterns.append(path(self.slug+"<id>/",self.api,name=name))
         
         #urlpatterns.append(path(slug,self.__call__,name=name))
     def login_required(self,request,message=None,permissions=[]):
@@ -940,6 +940,7 @@ class ResourceViewRest(ResourceView):
         if self.model:
             
             data={k:v for k,v in request.GET.items()}
+            print("rrrrrr",self.filter)
             filters.update(self.filter)
             data.update(filters)
             items=[clear_view(self.model,serialize(item),request.user) for item in self.model.objects.filter(**data)]
@@ -958,8 +959,11 @@ class ResourceViewRest(ResourceView):
             try:
                 data={key:value for key,value in request.GET.items()}
                 self.middleware("get",request,data)
+
+                data["id"]=id
                 return JsonResponse({"_meta":{"message":"Busqueda encontrada"},"item":clear_view(self.model,serialize(self.model.objects.get(**data)),request.user )})
-            except:
+            except Exception as e:
+                print("wwwwwww",e)
                 return JsonResponse({"_meta":{"message":"No se encontraron resultados","item":None}})
         return HttpResponse("Debe implementar el metodo 'index'")
     

@@ -28,7 +28,6 @@ def get_field_label(lst,model):
 
 @register.simple_tag
 def get_field_value(lst,model,list1,field):
-    print("wwwwwww",lst,model,list1,field)
     if model:
         field_object=model._meta.get_field(list1[lst])
 
@@ -39,9 +38,11 @@ def get_field_value(lst,model,list1,field):
             #return field_object
     else:
         return field[list1[lst]]
+
 @register.filter
 def json(value):
     import json
+  
     return json.dumps(value)
     
 @register.filter
@@ -65,7 +66,6 @@ def do_widget(field):
     from main.forms import TemplateForm,SortableSelectMultiple,TemplateForm
     #from multiselectfield.forms.fields import MultiSelectFormField
     #from easy_select2.widgets import Select2TextInput
-    print("####>>>>>>>",field)
     class Form(TemplateForm):
         """docstring for Form"""
         
@@ -108,6 +108,7 @@ def prueba(valor):
 def json(valor):
     import json
     from django.utils.html import mark_safe
+    
     return mark_safe(json.dumps(valor,indent=4, sort_keys=True))
 @register.simple_tag 
 def do_shortcode(valor):

@@ -17,6 +17,7 @@ if document.querySelector("#table_app"):
 	window.toolbar=ToolBar().mount("#toolbar")
 if document.querySelector("#media_modal"):
 	window.media=Media().mount("#media_modal")
+	pass
 if document.querySelector("#edit_app"):
 	window.edit=Edit().mount("#edit_app")
 if document.querySelector("#install_plugins"):

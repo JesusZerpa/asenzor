@@ -15,16 +15,13 @@
 </style>
 <script type="text/javascript" src="{% static 'js/bootstrap-tagsinput.min.js' %}"></script>
 <script src="https://cdn.tiny.cloud/1/b09tt8f829lohvfejyj3w3hknkp0f0sazoh4r1s73sszb6pt/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+
 <script>
 	window.BASE_URL='{{BASE_URL}}'
   window.ASENZOR_URL='{{ASENZOR_URL}}'
 	window.BASE_URL_FULL='{{BASE_URL_FULL}}'
-  {%if DATA%}
-  window.DATA={{DATA|json}}
-  {%else%}
-  window.DATA={}
-  {%endif%}
   window.VUE_COMPONENTS={"asenzor":{}}
+
 </script>
 {%endblock%}
 {%block main%}
@@ -32,7 +29,6 @@
 
 
 <div class="d-flex" id="wrapper">
-
 
  <sidebar class="bg-light border-right"  id="sidebar-wrapper">
 <div class="sidebar-heading" >

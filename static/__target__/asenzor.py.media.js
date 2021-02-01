@@ -1,4 +1,4 @@
-// Transcrypt'ed from Python, 2021-01-27 02:20:44
+// Transcrypt'ed from Python, 2021-02-01 02:03:28
 var re = {};
 import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __proxy__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 import * as __module_re__ from './re.js';
@@ -15,12 +15,12 @@ export var Media =  __class__ ('Media', [VuePy], {
 	get data () {return __get__ (this, function (self) {
 		return dict ({'images': [], 'dragAndDropCapable': false, 'files': [], 'uploadPercentage': 0, 'selected': [], 'desmark': [], 'mediatabs': self.mediatabs, 'active': null, 'search': '', 'resources': []});
 	});},
-	get determineDragAndDropCapable () {return __get__ (this, function (self) {
+	get determineDragAndDropCapable () {return __get__ (this, async function (self) {
 		var div = document.createElement ('div');
 		return (__in__ ('draggable', dir (div)) || __in__ ('ondragstart', dir (div)) && __in__ ('ondrop', dir (div))) && __in__ ('FormData', window) && __in__ ('FileReader', window);
 	});},
-	get mounted () {return __get__ (this, function (self) {
-		self.vue.dragAndDropCapable = self.determineDragAndDropCapable ();
+	get mounted () {return __get__ (this, async function (self) {
+		self.vue.dragAndDropCapable = await self.determineDragAndDropCapable ();
 		if (self.vue.dragAndDropCapable) {
 			var for_events = function (evt) {
 				var add_event = function (e) {
@@ -46,11 +46,11 @@ export var Media =  __class__ ('Media', [VuePy], {
 		self.vue ['$refs'].fileform.addEventListener ('drop', capture_files);
 		fetch ('/json/media/', {'method': 'GET'}).then ((function __lambda__ (res) {
 			return res.json ();
-		})).then (self.drawImages).catch ((function __lambda__ (e) {
+		})).then (await self.drawImages).catch ((function __lambda__ (e) {
 			return self.vue ['$root'].alert (e, 'danger');
 		}));
 	});},
-	get drawImages () {return __get__ (this, function (self, data) {
+	get drawImages () {return __get__ (this, async function (self, data) {
 		var files = [];
 		for (var elem of data ['items']) {
 			files.append (dict ({'src': elem ['guid'], 'id': elem ['id'], 'alternative': '', 'title': (elem ['title'] ? elem ['title'] : ''), 'name': elem ['name'], 'author': elem ['author'] ['username'], 'description': elem ['content'], 'sizes': elem ['sizes']}));
@@ -58,13 +58,13 @@ export var Media =  __class__ ('Media', [VuePy], {
 		self.vue.images = files;
 		self.vue.resources = files;
 	});},
-	get getImagePreviews () {return __get__ (this, function (self) {
+	get getImagePreviews () {return __get__ (this, async function (self) {
 		var i = 0;
 	});},
-	get removeFile () {return __get__ (this, function (self, clave) {
+	get removeFile () {return __get__ (this, async function (self, clave) {
 		self.vue.files.splice (clave, 1);
 	});},
-	get submitFiles () {return __get__ (this, function (self) {
+	get submitFiles () {return __get__ (this, async function (self) {
 		var formData = new FormData ();
 		var i = 0;
 		console.log (self.vue.files);
@@ -75,16 +75,16 @@ export var Media =  __class__ ('Media', [VuePy], {
 		}
 		fetch ('/json/media/', {'method': 'POST', 'body': formData}).then ((function __lambda__ (res) {
 			return res.json ();
-		})).then (self.uploaded).catch ((function __lambda__ (e) {
+		})).then (await self.uploaded).catch ((function __lambda__ (e) {
 			return console.log ('FAILURE!!', e);
 		}));
 		self.vue.files = [];
 	});},
-	get onUploadProgress () {return __get__ (this, function (self, progressEvent) {
+	get onUploadProgress () {return __get__ (this, async function (self, progressEvent) {
 		self.uploadPercentage = parseInt (Math.round ((progressEvent.loaded * 100) / progressEvent.total));
 		self.uploadPercentage.bind (self.vue);
 	});},
-	get uploaded () {return __get__ (this, function (self, data) {
+	get uploaded () {return __get__ (this, async function (self, data) {
 		var item = data ['item'];
 		var src = item ['guid'];
 		delete item ['guid'];
@@ -98,16 +98,16 @@ export var Media =  __class__ ('Media', [VuePy], {
 		$ ('#subir-archivo-tab').removeClass ('active');
 		$ ('#biblioteca-medios-tab').addClass ('active');
 	});},
-	get upload () {return __get__ (this, function (self) {
+	get upload () {return __get__ (this, async function (self) {
 		// pass;
 	});},
-	get drag () {return __get__ (this, function (self) {
+	get drag () {return __get__ (this, async function (self) {
 		// pass;
 	});},
-	get drop () {return __get__ (this, function (self) {
+	get drop () {return __get__ (this, async function (self) {
 		// pass;
 	});},
-	get py_clear () {return __get__ (this, function (self) {
+	get py_clear () {return __get__ (this, async function (self) {
 		self.vue.selected = [];
 		self.vue.desmark = [];
 		for (var elem of dict (self.vue ['$refs']).py_keys ()) {
@@ -118,22 +118,22 @@ export var Media =  __class__ ('Media', [VuePy], {
 			}
 		}
 	});},
-	get remove () {return __get__ (this, function (self) {
+	get remove () {return __get__ (this, async function (self) {
 		// pass;
 		fetch ('/json/media/', {'method': 'DELETE', 'body': formData}).then ((function __lambda__ (res) {
 			return res.json ();
-		})).then (self.deleted).catch ((function __lambda__ (e) {
+		})).then (await self.deleted).catch ((function __lambda__ (e) {
 			return console.log ('FAILURE!!', e);
 		}));
 	});},
-	get edit () {return __get__ (this, function (self) {
+	get edit () {return __get__ (this, async function (self) {
 		fetch ('/json/media/', {'method': 'PUT', 'body': formData}).then ((function __lambda__ (res) {
 			return res.json ();
-		})).then (self.edited).catch ((function __lambda__ (e) {
+		})).then (await self.edited).catch ((function __lambda__ (e) {
 			return console.log ('FAILURE!!', e);
 		}));
 	});},
-	get deleted () {return __get__ (this, function (self, data) {
+	get deleted () {return __get__ (this, async function (self, data) {
 		var l = [];
 		for (var elem of self.vue.images) {
 			if (elem.id != data ['item']) {
@@ -142,10 +142,10 @@ export var Media =  __class__ ('Media', [VuePy], {
 		}
 		self.vue.images = l;
 	});},
-	get edited () {return __get__ (this, function (self, data) {
+	get edited () {return __get__ (this, async function (self, data) {
 		// pass;
 	});},
-	get select () {return __get__ (this, function (self, event, py_name) {
+	get select () {return __get__ (this, async function (self, event, py_name) {
 		if (!(self.single)) {
 			console.log (len (self.vue.selected) == 0 || event.ctrlKey, len (self.vue.selected) == 0, event.ctrlKey);
 			if (len (self.vue.selected) == 0 || event.ctrlKey) {
@@ -166,7 +166,7 @@ export var Media =  __class__ ('Media', [VuePy], {
 				else {
 					self.vue ['$refs'] [py_name] [0].style.border = 'solid 2px blue';
 					self.vue.selected.push (py_name);
-					self.vue.active = self.activate (self.getdata (self.vue ['$refs'] [py_name] [0].id));
+					self.vue.active = await self.activate (await self.getdata (self.vue ['$refs'] [py_name] [0].id));
 				}
 			}
 			else if (event.shiftKey) {
@@ -217,13 +217,13 @@ export var Media =  __class__ ('Media', [VuePy], {
 				self.vue.selected = [py_name];
 				self.vue.desmark = [];
 			}
-			self.vue.active = self.activate (self.getdata (self.vue ['$refs'] [py_name] [0].id));
+			self.vue.active = await self.activate (await self.getdata (self.vue ['$refs'] [py_name] [0].id));
 		}
 		else if (self.single) {
 			if (len (list (self.vue.selected)) == 0) {
 				self.vue.selected.push (py_name);
 				self.vue ['$refs'] [py_name] [0].style.border = 'solid 2px blue';
-				self.vue.active = self.activate (self.getdata (self.vue ['$refs'] [py_name] [0].id));
+				self.vue.active = await self.activate (await self.getdata (self.vue ['$refs'] [py_name] [0].id));
 			}
 			else if (self.vue.selected.includes (py_name)) {
 				var i = self.vue.selected.indexOf (py_name);
@@ -238,21 +238,21 @@ export var Media =  __class__ ('Media', [VuePy], {
 					}
 				}
 				self.vue ['$refs'] [py_name] [0].style.border = 'solid 2px blue';
-				self.vue.active = self.activate (self.getdata (self.vue ['$refs'] [py_name] [0].id));
+				self.vue.active = await self.activate (await self.getdata (self.vue ['$refs'] [py_name] [0].id));
 			}
 		}
 	});},
-	get getdata () {return __get__ (this, function (self, id) {
+	get getdata () {return __get__ (this, async function (self, id) {
 		for (var img of self.vue.images) {
 			if (img.id == int (id)) {
 				return img;
 			}
 		}
 	});},
-	get activate () {return __get__ (this, function (self, data) {
+	get activate () {return __get__ (this, async function (self, data) {
 		return data;
 	});},
-	get accept () {return __get__ (this, function (self) {
+	get accept () {return __get__ (this, async function (self) {
 		var selected = [];
 		for (var elem of self.vue.selected) {
 			for (var img of self.vue.images) {
@@ -263,7 +263,7 @@ export var Media =  __class__ ('Media', [VuePy], {
 		}
 		self.vue ['$emit'] ('accept', selected);
 		$ ('#media_modal').modal ('hide');
-		self.off ();
+		await self.off ();
 	});}
 });
 

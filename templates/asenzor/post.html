@@ -1,6 +1,16 @@
 {% extends "asenzor/layouts/dashboard.html" %}
 {%load static%}
 {%load  custom_filters%}
+{%block head%}
+{{block.super}}
+<script type="text/javascript">
+	window.POST_ID={{post.id}}
+	window.POST_TYPE='{{post_type}}'
+	window.TEMPLATE='{{meta.template}}'
+	window.POST_ORDER={%if post.menu_order %}{{post.menu_order}}{%else%}0{%endif%}
+
+</script>
+{%endblock%}
 {%block content%}
 <div id="post_toolbar">
 	<div class="options">
@@ -62,8 +72,8 @@
 	{%include template%}
 	</script>
 	{%endfor%}
-nnn
-<div id="edit_app" class="container" post_type="{{post_type}}" style="background: rgb(241, 241, 241)">
+
+<div id="edit_app" class="container" style="background: rgb(241, 241, 241)">
 
 	
 	<div class="row">
@@ -84,10 +94,10 @@ nnn
 			[[content]]
 		</pre>
 	-->
+	[[models]]
 		<input 
 			type="hidden" 
 			name="type" 
-			data-value="{{post.type}}"
 			v-model="type" 
 			:ref="'type'" 
 			>
@@ -214,7 +224,6 @@ nnn
 				
 				<input  
 					v-model="order"  
-					value="{%if post.menu_order %}{{post.menu_order}}{%else%}0{%endif%}" 
 					:ref="'order'" 
 					type="" 
 					name="" 
@@ -222,7 +231,7 @@ nnn
 					</div>
 				<div>
 				<label>Template</label>
-				<select v-model="template" :ref="'template'" value="{{meta.template}}">
+				<select v-model="template" :ref="'template'">
 					{%for elem in templates%}
 					<option>{{elem}}</option>
 					{%endfor%}

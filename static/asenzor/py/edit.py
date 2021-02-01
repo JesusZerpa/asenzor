@@ -33,18 +33,14 @@ class Edit(VuePy):
     order=None
     extra_data={}
     toogle={}
-    post_type=None
     title=None
     def created(self):
         window.edit=self.vue
     def data(self):
+        #este metodo en vue nunca sera asyncrono
         models={}
-        for name,widget in self.get_by_type("Color").items():
-                if "v-model" in dict(widget["options"]).keys():
-                    models[widget["options"]["v-model"].split(".")[1]]=widget["value"]
-
-        return {"content":window.DATA["post"]["content"] if window.DATA["post"] else "",
-                "title":window.DATA["post"]["title"] if window.DATA["post"] else "",
+        return {"content": "",
+                "title": "",
                 "status":None,
                 "author":None,
                 "order":None,
@@ -52,19 +48,21 @@ class Edit(VuePy):
                 "template":None,
                 "main_image":None,
                 "toogle":self.toogle,
-                "post_type":None,
+                "post_type":POST_TYPE,
                 "type":"post",
                 "models":models}
-    def mounted(self):
-        self.vue["post_type"]=self.vue["$el"]["attributes"]["post_type"]["value"]
-        if window.DATA["post"]["content"]:
-            console.log("wwwww",self.vue.get_by_type("Color"))
-            for name,widget in self.vue.get_by_type("Color").items():
-                if "v-model" in dict(widget["options"]).keys():
-                    self.vue.models[widget["options"]["v-model"]]=widget["value"]
-                    console.log("hhhh",self.vue.models[widget["options"]["v-model"]],widget["value"])
-        self.vue.template=self.vue["$refs"]["template"].attributes["value"]["value"]
-
+    async def mounted(self):
+        vue=self.vue
+        content=(await self.get_data())["post"]["content"] if (await self.get_data())["post"] else ""
+        title=(await self.get_data())["post"]["title"] if (await self.get_data())["post"] else ""
+        color=(await vue.get_by_type("Color"))
+        for name,widget in color.items():
+                if "v-model" in dict(widget["options"]).keys(): 
+                    if widget["options"]["v-model"].split(".")[0]=="models":
+                        vue.models[widget["options"]["v-model"].split(".")[1]]=widget["value"]
+                    else:
+                        console.error("v-model solo se permite bajo el formato models.[name-model]")
+        self.vue.template=TEMPLATE
         for elem in dict(self.vue["$refs"]).keys():
             if elem.startswith("toogle-"):
                 self.vue["$refs"][elem]
@@ -75,8 +73,8 @@ class Edit(VuePy):
             self.vue.content=
         """
         
-        self.vue.order=self.vue["$refs"]["order"].attributes["value"]["value"]
-        self.vue["type"]=self.vue["$refs"]["type"].attributes["data-value"]["value"]
+        self.vue.order=POST_ORDER
+        self.vue["type"]=(await self.get_data())["type"]
         """
         if self.vue["$refs"]["editor"]:
             console.log("dddddddd",self.vue["$refs"]["editor"]["$attrs"]["name"])
@@ -84,8 +82,9 @@ class Edit(VuePy):
                 "[data-name='"+self.vue["$refs"]["editor"]["$attrs"]["name"]+"']"
                 ).value
         """
+      
         def sticky():
-            
+          
             altura = s('.panel2').offset().top;
             altura = s('.navbar').offset().top;
             
@@ -99,7 +98,7 @@ class Edit(VuePy):
         
     
         s(document).ready(sticky)
-        console.log("iiii")
+     
  
 
     def update_from_widget(self,evt,value,name):
@@ -130,7 +129,7 @@ class Edit(VuePy):
         form.append("menu_order",self.vue.order)
         form.append("status","publish")
         if window.DATA["post"]:
-            form.append("id",window.DATA["post"]["id"])
+            form.append("id",await self.get_data()["id"])
         console.log("xxxxxx",self.vue.post_type)
         if self.vue.post_type=="custom":
             content=JSON.stringify(self.vue.content)
@@ -157,18 +156,20 @@ class Edit(VuePy):
         __pragma__("jsiter")
         req=await fetch("/json/postmeta/",{
             "body":form,
-            "method":"PATCH" if window.DATA["post"]["id"]!=js_undefined else "POST"
+            "method":"PATCH" if await self.get_data()["id"]!=js_undefined else "POST"
             })
         __pragma__("nojsiter")
 
     async def save(self):
+        alert("guardar")
         form=__new__(FormData)()
         form.append("title",self.vue.title)
         form.append("type",self.vue["type"])
         form.append("menu_order",self.vue.order)
         form.append("status","trash")
-        if window.DATA["post"]:
-            form.append("id",window.DATA["post"]["id"])
+        DATA=await self.get_data()
+        console.log("eeeeee",DATA)
+        form.append("id",DATA["id"])
         console.log("xxxxxx",self.vue.post_type)
         if self.vue.post_type=="custom":
             content=JSON.stringify(self.vue.content)
@@ -181,13 +182,13 @@ class Edit(VuePy):
 
         req=await fetch("/json/posts/",{
             "body":form,
-            "method":"PATCH" if window.DATA["post"]["id"]!=js_undefined else "POST",
+            "method":"PATCH" if await self.get_data()["id"]!=js_undefined else "POST",
             })
         console.log(req.status)
         if req.status==200:
-            self.alert("Actualizado con exito")
+            await self.alert("Actualizado con exito")
         else:
-            self.alert("A ocurrido un error","warning")
+            await self.alert("A ocurrido un error","warning")
         data=await req.json()
         post=data["item"]
        
@@ -200,13 +201,13 @@ class Edit(VuePy):
         __pragma__("jsiter")
         req=await fetch("/json/postmeta/",{
             "body":form,
-            "method":"PATCH" if window.DATA["post"]["id"]!=js_undefined else "POST"
+            "method":"PATCH" if await self.get_data()["id"]!=js_undefined else "POST"
             })
         __pragma__("nojsiter")
 
     
 
-    def alert(self,text,status="success"):
+    async def alert(self,text,status="success"):
         node=s("""<div id="alert" class="alert alert-dismissible fade show" style="position: fixed;top:20px;right: 20px" role="alert">
           {}
           <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -217,33 +218,45 @@ class Edit(VuePy):
 
         s(document.body).append(node)
 
-    def update_content(self,data):
-     
+    async def update_content(self,data):
         for elem,value in dict(data).items():
             name=elem.split(".")
-         
-            if len(name)==2:
-                self.vue.content[name[0]][name[1]]["value"]=value
-            elif len(name)==3:
-                self.vue.content[name[0]][name[1]]["value"][name[2]]=value
-                
-    def get_content(self,name):  
-        if DATA["post"] and DATA["post"]["content"]:  
+            console.log([elem,value])
+            if self.vue.content:
+                if len(name)==2:
+
+                    self.vue.content[name[0]][name[1]]["value"]=value
+                elif len(name)==3:
+                    self.vue.content[name[0]][name[1]]["value"][name[2]]=value
+                    
+    async def get_content(self,name):  
+        DATA=await self.get_data()
+        if DATA["content"]:  
             name=name.split(".")
             if len(name)==2:
-                return DATA["post"]["content"][name[0]][name[1]]["value"]
+                return DATA["content"][name[0]][name[1]]["value"]
             elif len(name)==3:
-                return DATA["post"]["content"][name[0]][name[1]]["value"][name[2]]
+                return DATA["content"][name[0]][name[1]]["value"][name[2]]
         else:
             return None
-    def get_by_type(self,type):
+    async def get_by_type(self,type):
         components={}  
-        if DATA["post"] and DATA["post"]["content"]:  
-            for elem in dict(DATA["post"]["content"]).keys():
+        DATA=await self.get_data()
+        if  DATA["content"]:  
+            for elem in dict(DATA["content"]).keys():
                 
-                for elem2 in dict(DATA["post"]["content"][elem]).keys():
-                    if type==DATA["post"]["content"][elem][elem2]["type"]:
-                        components[elem+"."+elem2]=DATA["post"]["content"][elem][elem2]
-                   
+                for elem2 in dict(DATA["content"][elem]).keys():
+                    if type==DATA["content"][elem][elem2]["type"]:
+                        components[elem+"."+elem2]=DATA["content"][elem][elem2]
         return components
+    async def get_data(self):
+        if "DATA" not in dir(window):
+            req=await fetch(f"/json/posts/{POST_ID}/")
+            data=await req.json()
+            item=data["item"]
+            window.DATA=item
+            item["content"]=JSON.parse(item["content"])
+            return item
+        else:
+            return DATA
 app=Edit()

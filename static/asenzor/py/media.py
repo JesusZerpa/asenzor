@@ -24,7 +24,7 @@ class Media(VuePy):
                  }
 
 
-    def determineDragAndDropCapable(self):
+    async def determineDragAndDropCapable(self):
         """
         Determines if the drag and drop functionality is in the
         window
@@ -46,11 +46,11 @@ class Media(VuePy):
             or ( 'ondragstart' in dir(div) and 'ondrop' in dir(div) ) )\
             and 'FormData' in window\
             and 'FileReader' in window;
-    def mounted(self):
+    async def mounted(self):
         """
         Determine if drag and drop functionality is capable in the browser
         """
-        self.vue.dragAndDropCapable = self.determineDragAndDropCapable();
+        self.vue.dragAndDropCapable = await self.determineDragAndDropCapable();
         """
         If drag and drop capable, then we continue to bind events to our elements.
         """
@@ -96,10 +96,10 @@ class Media(VuePy):
             "method":"GET",
             })\
         .then(lambda res:res.json())\
-        .then(self.drawImages)\
+        .then(await self.drawImages)\
         .catch(lambda e:self.vue["$root"].alert(e,"danger") );
         __pragma__ ('nojsiter')
-    def drawImages(self,data):
+    async def drawImages(self,data):
         
         files=[]
 
@@ -120,7 +120,7 @@ class Media(VuePy):
 
 
 
-    def getImagePreviews(self): 
+    async def getImagePreviews(self): 
         """ 
         Obtiene la vista previa de la imagen del archivo. 
         Itere todos los archivos y genere una vista previa de la imagen para cada uno. 
@@ -128,13 +128,13 @@ class Media(VuePy):
         i=0
 
     
-    def removeFile (self,clave):
+    async def removeFile (self,clave):
         """
         Elimina un archivo seleccionado que el usuario ha subido 
         """
         self.vue.files.splice (clave, 1); 
     
-    def submitFiles(self):
+    async def submitFiles(self):
         """
         Submits the files to the server
         Initialize the form data
@@ -161,19 +161,19 @@ class Media(VuePy):
             "body":formData,
             })\
         .then(lambda res:res.json())\
-        .then(self.uploaded)\
+        .then(await self.uploaded)\
         .catch(lambda e:console.log('FAILURE!!',e));
         __pragma__ ('nojsiter')
         self.vue.files=[]
         
 
-    def onUploadProgress(self,progressEvent): 
+    async def onUploadProgress(self,progressEvent): 
         self.uploadPercentage = parseInt (Math.round ((progressEvent.loaded * 100) / progressEvent.total));
         self.uploadPercentage.bind(self.vue)
         
 
   
-    def uploaded(self,data):
+    async def uploaded(self,data):
         item=data["item"]
         src=item["guid"]
         del item["guid"]
@@ -188,13 +188,13 @@ class Media(VuePy):
         s("#subir-archivo-tab").removeClass("active")
         s("#biblioteca-medios-tab").addClass("active")
 
-    def upload(self):
+    async def upload(self):
         pass
-    def drag(self):
+    async def drag(self):
         pass
-    def drop(self):
+    async def drop(self):
         pass
-    def clear(self):
+    async def clear(self):
         """
         Resetea los valores de la seleccion y desmarcados
         """
@@ -204,7 +204,7 @@ class Media(VuePy):
             if elem.startswith("media_"):
                 if len(self.vue ['$refs'][elem]):
                     self.vue["$refs"][elem][0].style.border="none"
-    def remove(self):
+    async def remove(self):
         pass
 
         __pragma__ ('jsiter') 
@@ -214,10 +214,10 @@ class Media(VuePy):
             "body":formData,
             })\
         .then(lambda res:res.json())\
-        .then(self.deleted)\
+        .then(await self.deleted)\
         .catch(lambda e:console.log('FAILURE!!',e));
         __pragma__ ('nojsiter')
-    def edit(self):
+    async def edit(self):
         __pragma__ ('jsiter') 
         fetch('/json/media/',
             {
@@ -225,19 +225,19 @@ class Media(VuePy):
             "body":formData,
             })\
         .then(lambda res:res.json())\
-        .then(self.edited)\
+        .then(await self.edited)\
         .catch(lambda e:console.log('FAILURE!!',e));
         __pragma__ ('nojsiter')
-    def deleted(self,data):
+    async def deleted(self,data):
         l=[]
         for elem in self.vue.images:
             if elem.id!=data["item"]:
                 l.append(elem)
         self.vue.images=l
-    def edited(self,data):
+    async def edited(self,data):
         pass
 
-    def select(self,event,name):
+    async def select(self,event,name):
 
         
 
@@ -261,7 +261,7 @@ class Media(VuePy):
                 else:
                     self.vue["$refs"][name][0].style.border="solid 2px blue"
                     self.vue.selected.push(name)
-                    self.vue.active=self.activate(self.getdata(self.vue["$refs"][name][0].id))
+                    self.vue.active=await self.activate(await self.getdata(self.vue["$refs"][name][0].id))
             elif event.shiftKey:
                 start=self.vue.selected.slice(-1)[0]
                 slug,id=name.split("_")
@@ -302,13 +302,13 @@ class Media(VuePy):
                 self.vue["$refs"][name][0].style.border="solid 2px blue"
                 self.vue.selected=[name]
                 self.vue.desmark=[]
-            self.vue.active=self.activate(self.getdata(self.vue["$refs"][name][0].id))
+            self.vue.active=await self.activate(await self.getdata(self.vue["$refs"][name][0].id))
         
         elif self.single:
             if len(list(self.vue.selected))==0:
                 self.vue.selected.push(name)
                 self.vue["$refs"][name][0].style.border="solid 2px blue"
-                self.vue.active=self.activate(self.getdata(self.vue["$refs"][name][0].id))
+                self.vue.active=await self.activate(await self.getdata(self.vue["$refs"][name][0].id))
             else:
                 if self.vue.selected.includes(name):
                     i=self.vue.selected.indexOf(name)
@@ -321,18 +321,18 @@ class Media(VuePy):
                             self.vue["$refs"][name][0].style.border="inherit"
 
                     self.vue["$refs"][name][0].style.border="solid 2px blue"
-                    self.vue.active=self.activate(self.getdata(self.vue["$refs"][name][0].id))
-    def getdata(self,id):
+                    self.vue.active=await self.activate(await self.getdata(self.vue["$refs"][name][0].id))
+    async def getdata(self,id):
         for img in self.vue.images:
             if img.id==int(id):
                 return img
-    def activate(self,data):
+    async def activate(self,data):
         return data
 
 
 
 
-    def accept(self):
+    async def accept(self):
         selected=[]
         for elem in self.vue.selected:
             for img in self.vue.images:
@@ -340,7 +340,7 @@ class Media(VuePy):
                     selected.push(img)
         self.vue["$emit"]("accept",selected)
         s("#media_modal").modal("hide")
-        self.off()
+        await self.off()
 
 
 

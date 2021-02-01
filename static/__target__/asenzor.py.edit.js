@@ -1,4 +1,4 @@
-// Transcrypt'ed from Python, 2021-01-29 21:42:34
+// Transcrypt'ed from Python, 2021-02-01 05:21:53
 import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __proxy__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 import {Color} from './asenzor.py.colorpicker.js';
 import {Embeded} from './asenzor.py.embeded.js';
@@ -28,40 +28,38 @@ export var Edit =  __class__ ('Edit', [VuePy], {
 	order: null,
 	extra_data: dict ({}),
 	toogle: dict ({}),
-	post_type: null,
 	title: null,
 	get created () {return __get__ (this, function (self) {
 		window.edit = self.vue;
 	});},
 	get data () {return __get__ (this, function (self) {
 		var models = dict ({});
-		for (var [py_name, widget] of self.get_by_type ('Color').py_items ()) {
-			if (__in__ ('v-model', dict (widget ['options']).py_keys ())) {
-				models [widget ['options'] ['v-model'].py_split ('.') [1]] = widget ['value'];
-			}
-		}
-		return dict ({'content': (window.DATA ['post'] ? window.DATA ['post'] ['content'] : ''), 'title': (window.DATA ['post'] ? window.DATA ['post'] ['title'] : ''), 'status': null, 'author': null, 'order': null, 'type': null, 'template': null, 'main_image': null, 'toogle': self.toogle, 'post_type': null, 'type': 'post', 'models': models});
+		return dict ({'content': '', 'title': '', 'status': null, 'author': null, 'order': null, 'type': null, 'template': null, 'main_image': null, 'toogle': self.toogle, 'post_type': POST_TYPE, 'type': 'post', 'models': models});
 	});},
-	get mounted () {return __get__ (this, function (self) {
-		self.vue ['post_type'] = self.vue ['$el'] ['attributes'] ['post_type'] ['value'];
-		if (window.DATA ['post'] ['content']) {
-			console.log ('wwwww', self.vue.get_by_type ('Color'));
-			for (var [py_name, widget] of self.vue.get_by_type ('Color').py_items ()) {
-				if (__in__ ('v-model', dict (widget ['options']).py_keys ())) {
-					self.vue.models [widget ['options'] ['v-model']] = widget ['value'];
-					console.log ('hhhh', self.vue.models [widget ['options'] ['v-model']], widget ['value']);
+	get mounted () {return __get__ (this, async function (self) {
+		var vue = self.vue;
+		var content = (await self.get_data () ['post'] ? await self.get_data () ['post'] ['content'] : '');
+		var title = (await self.get_data () ['post'] ? await self.get_data () ['post'] ['title'] : '');
+		var color = await vue.get_by_type ('Color');
+		for (var [py_name, widget] of color.py_items ()) {
+			if (__in__ ('v-model', dict (widget ['options']).py_keys ())) {
+				if (widget ['options'] ['v-model'].py_split ('.') [0] == 'models') {
+					vue.models [widget ['options'] ['v-model'].py_split ('.') [1]] = widget ['value'];
+				}
+				else {
+					console.error ('v-model solo se permite bajo el formato models.[name-model]');
 				}
 			}
 		}
-		self.vue.template = self.vue ['$refs'] ['template'].attributes ['value'] ['value'];
+		self.vue.template = TEMPLATE;
 		for (var elem of dict (self.vue ['$refs']).py_keys ()) {
 			if (elem.startswith ('toogle-')) {
 				self.vue ['$refs'] [elem];
 				self.vue.toogle [elem] = true;
 			}
 		}
-		self.vue.order = self.vue ['$refs'] ['order'].attributes ['value'] ['value'];
-		self.vue ['type'] = self.vue ['$refs'] ['type'].attributes ['data-value'] ['value'];
+		self.vue.order = POST_ORDER;
+		self.vue ['type'] = await self.get_data () ['type'];
 		var sticky = function () {
 			var altura = $ ('.panel2').offset ().top;
 			var altura = $ ('.navbar').offset ().top;
@@ -76,7 +74,6 @@ export var Edit =  __class__ ('Edit', [VuePy], {
 			$ (window).on ('scroll', py_switch);
 		};
 		$ (document).ready (sticky);
-		console.log ('iiii');
 	});},
 	get update_from_widget () {return __get__ (this, function (self, evt, value, py_name) {
 		if (py_name) {
@@ -95,7 +92,7 @@ export var Edit =  __class__ ('Edit', [VuePy], {
 		form.append ('menu_order', self.vue.order);
 		form.append ('status', 'publish');
 		if (window.DATA ['post']) {
-			form.append ('id', window.DATA ['post'] ['id']);
+			form.append ('id', await self.get_data () ['id']);
 		}
 		console.log ('xxxxxx', self.vue.post_type);
 		if (self.vue.post_type == 'custom') {
@@ -120,17 +117,18 @@ export var Edit =  __class__ ('Edit', [VuePy], {
 		}
 		form.append ('post', post ['id']);
 		form.append ('template', self.vue.template);
-		var req = await fetch ('/json/postmeta/', {'body': form, 'method': (window.DATA ['post'] ['id'] != undefined ? 'PATCH' : 'POST')});
+		var req = await fetch ('/json/postmeta/', {'body': form, 'method': (await self.get_data () ['id'] != undefined ? 'PATCH' : 'POST')});
 	});},
 	get save () {return __get__ (this, async function (self) {
+		alert ('guardar');
 		var form = new FormData ();
 		form.append ('title', self.vue.title);
 		form.append ('type', self.vue ['type']);
 		form.append ('menu_order', self.vue.order);
 		form.append ('status', 'trash');
-		if (window.DATA ['post']) {
-			form.append ('id', window.DATA ['post'] ['id']);
-		}
+		var DATA = await self.get_data ();
+		console.log ('eeeeee', DATA);
+		form.append ('id', DATA ['id']);
 		console.log ('xxxxxx', self.vue.post_type);
 		if (self.vue.post_type == 'custom') {
 			var content = JSON.stringify (self.vue.content);
@@ -139,13 +137,13 @@ export var Edit =  __class__ ('Edit', [VuePy], {
 		else {
 			form.append ('content', self.vue.content);
 		}
-		var req = await fetch ('/json/posts/', dict ({'body': form, 'method': (window.DATA ['post'] ['id'] != undefined ? 'PATCH' : 'POST')}));
+		var req = await fetch ('/json/posts/', dict ({'body': form, 'method': (await self.get_data () ['id'] != undefined ? 'PATCH' : 'POST')}));
 		console.log (req.status);
 		if (req.status == 200) {
-			self.alert ('Actualizado con exito');
+			await self.alert ('Actualizado con exito');
 		}
 		else {
-			self.alert ('A ocurrido un error', 'warning');
+			await self.alert ('A ocurrido un error', 'warning');
 		}
 		var data = await req.json ();
 		var post = data ['item'];
@@ -155,9 +153,9 @@ export var Edit =  __class__ ('Edit', [VuePy], {
 		}
 		form.append ('post', post ['id']);
 		form.append ('template', self.vue.template);
-		var req = await fetch ('/json/postmeta/', {'body': form, 'method': (window.DATA ['post'] ['id'] != undefined ? 'PATCH' : 'POST')});
+		var req = await fetch ('/json/postmeta/', {'body': form, 'method': (await self.get_data () ['id'] != undefined ? 'PATCH' : 'POST')});
 	});},
-	get alert () {return __get__ (this, function (self, text, status) {
+	get alert () {return __get__ (this, async function (self, text, status) {
 		if (typeof status == 'undefined' || (status != null && status.hasOwnProperty ("__kwargtrans__"))) {;
 			var status = 'success';
 		};
@@ -165,43 +163,61 @@ export var Edit =  __class__ ('Edit', [VuePy], {
 		node.addClass ('alert-' + status);
 		$ (document.body).append (node);
 	});},
-	get update_content () {return __get__ (this, function (self, data) {
+	get update_content () {return __get__ (this, async function (self, data) {
 		for (var [elem, value] of dict (data).py_items ()) {
 			var py_name = elem.py_split ('.');
-			if (len (py_name) == 2) {
-				self.vue.content [py_name [0]] [py_name [1]] ['value'] = value;
-			}
-			else if (len (py_name) == 3) {
-				self.vue.content [py_name [0]] [py_name [1]] ['value'] [py_name [2]] = value;
+			console.log ([elem, value]);
+			if (self.vue.content) {
+				if (len (py_name) == 2) {
+					self.vue.content [py_name [0]] [py_name [1]] ['value'] = value;
+				}
+				else if (len (py_name) == 3) {
+					self.vue.content [py_name [0]] [py_name [1]] ['value'] [py_name [2]] = value;
+				}
 			}
 		}
 	});},
-	get get_content () {return __get__ (this, function (self, py_name) {
-		if (DATA ['post'] && DATA ['post'] ['content']) {
+	get get_content () {return __get__ (this, async function (self, py_name) {
+		var DATA = await self.get_data ();
+		if (DATA ['content']) {
 			var py_name = py_name.py_split ('.');
 			if (len (py_name) == 2) {
-				return DATA ['post'] ['content'] [py_name [0]] [py_name [1]] ['value'];
+				return DATA ['content'] [py_name [0]] [py_name [1]] ['value'];
 			}
 			else if (len (py_name) == 3) {
-				return DATA ['post'] ['content'] [py_name [0]] [py_name [1]] ['value'] [py_name [2]];
+				return DATA ['content'] [py_name [0]] [py_name [1]] ['value'] [py_name [2]];
 			}
 		}
 		else {
 			return null;
 		}
 	});},
-	get get_by_type () {return __get__ (this, function (self, py_metatype) {
+	get get_by_type () {return __get__ (this, async function (self, py_metatype) {
 		var components = dict ({});
-		if (DATA ['post'] && DATA ['post'] ['content']) {
-			for (var elem of dict (DATA ['post'] ['content']).py_keys ()) {
-				for (var elem2 of dict (DATA ['post'] ['content'] [elem]).py_keys ()) {
-					if (py_metatype == DATA ['post'] ['content'] [elem] [elem2] ['type']) {
-						components [(elem + '.') + elem2] = DATA ['post'] ['content'] [elem] [elem2];
+		var DATA = await self.get_data ();
+		if (DATA ['content']) {
+			for (var elem of dict (DATA ['content']).py_keys ()) {
+				for (var elem2 of dict (DATA ['content'] [elem]).py_keys ()) {
+					if (py_metatype == DATA ['content'] [elem] [elem2] ['type']) {
+						components [(elem + '.') + elem2] = DATA ['content'] [elem] [elem2];
 					}
 				}
 			}
 		}
 		return components;
+	});},
+	get get_data () {return __get__ (this, async function (self) {
+		if (!__in__ ('DATA', dir (window))) {
+			var req = await fetch ('/json/posts/{}/'.format (POST_ID));
+			var data = await req.json ();
+			var item = data ['item'];
+			window.DATA = item;
+			item ['content'] = JSON.parse (item ['content']);
+			return item;
+		}
+		else {
+			return DATA;
+		}
 	});}
 });
 export var app = Edit ();

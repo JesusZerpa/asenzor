@@ -45,7 +45,7 @@ class VuePy:
 	delimiters=['[[', ']]']
 	__deployed__=False
 	__link__=False
-	def __init__(self,*args,**kwargs):
+	async def __init__(self,*args,**kwargs):
 		data={"methods":{},
 			  "watch":{},
 			  "compute":{}}
@@ -62,11 +62,12 @@ class VuePy:
 
 				if elem in self.methods:
 					def wrapper(self,elem):
-						def fn(*args):
-						
+						async def fn(*args):
 							that=this
 							self.vue=that
-							return self[elem](*args)
+							d=await self[elem](*args)
+							self.vue=that
+							return d
 						return fn 
 
 					data["methods"][elem]=wrapper(self,elem)
@@ -74,21 +75,25 @@ class VuePy:
 			
 				elif elem in self.computed:
 					def wrapper(self,elem):
-						def fn(*args):
+						async def fn(*args):
 						
 							that=this
 							self.vue=that
-							return self[elem](*args)
+							d=await self[elem](*args)
+							self.vue=that
+							return d
 						return fn 
 
 					data["computed"][elem]=wrapper(self,elem)
 				elif elem in self.watch:
 					def wrapper(self,elem):
-						def fn(*args):
+						async def fn(*args):
 						
 							that=this
 							self.vue=that
-							return self[elem](*args)
+							d=await self[elem](*args)
+							self.vue=that
+							return d
 						return fn 
 
 					data["watch"][elem]=wrapper(self,elem)
@@ -97,11 +102,13 @@ class VuePy:
 				else:
 					if typeof(getattr(self,elem))=="function":
 						def wrapper(self,elem):
-							def fn(*args):
-							
+							async def fn(*args):
 								that=this
 								self.vue=that
-								return self[elem](*args)
+								result=await self[elem](that,*args)
+								self.vue=that
+								return result
+
 							return fn 
 						data[elem]=wrapper(self,elem)
 					else:
@@ -114,11 +121,12 @@ class VuePy:
 
 		if "data" in dir(self):
 			def wrapper(self,elem):
-					def fn(*args):
-						that=this
-						self.vue=that
-						return clone(self["data"](*args))
-					return fn 
+				def fn(*args):
+					that=this
+
+					self.vue=that
+					return clone(self["data"](*args))
+				return fn 
 			if not self.__link__:
 				data["data"]=wrapper(self,"data")
 			
@@ -138,14 +146,14 @@ class VuePy:
 			self.vue._events=[]
 
 	
-	def deploy(self):
+	async def deploy(self):
 		if not self.__deployed__:
 			self.vue=__new__(Vue(self.__component__))
 			self.__deployed__=True
 		return self
 
-	def mount(self,el):
-		self.deploy()
+	async def mount(self,el):
+		await self.deploy()
 		self.vue["$mount"](el)
 		return self
 	def updated(self):

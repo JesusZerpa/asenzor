@@ -7,11 +7,11 @@ class TinyEditor(VuePy):
     """
     extends=Editor
     methods=["setContent"]
-    def data(self):
+    async def data(self):
 
         return {"name":self.vue["$attrs"]["name"]}
 
-    def mounted(self):
+    async def mounted(self):
         def setInit():
             if self.vue["editor"]:
 
