@@ -5,7 +5,6 @@ from .asenzor.py.edit import Edit
 from .asenzor.py.plugins import Plugins
 from .asenzor.py.support import Support
 from .asenzor.py.vuepy import Vue
-
 element=require("element-ui")
 
 element.locale("en")

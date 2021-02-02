@@ -237,14 +237,8 @@ class Media(VuePy):
     async def edited(self,data):
         pass
 
-<<<<<<< HEAD
     async def select(self,event,name):
 
-        
-
-=======
-    def select(self,event,name):
->>>>>>> 560cc5b517483a47493f7afa38b895a8b4adf0ac
         if not self.single:
             console.log( len(self.vue.selected)==0 or event.ctrlKey, len(self.vue.selected)==0 , event.ctrlKey)
             if len(self.vue.selected)==0 or event.ctrlKey:
