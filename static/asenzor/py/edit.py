@@ -23,7 +23,9 @@ Vue=require("vue")["default"]
 
 class Edit(VuePy):
     """docstring for MyAoo"""   
-    methods=["publish","save","update_from_widget","update_content","get_content","get_by_type"]
+    methods=["publish","save","update_from_widget",
+             "update_content","get_content","get_by_type",
+             "edit_guid_method","main_image_method"]
     components=window.VUE_COMPONENTS["asenzor"]
     content=""
     js_type=None
@@ -41,6 +43,7 @@ class Edit(VuePy):
         models={}
         return {"content": "",
                 "title": "",
+                "edit_guid":False,
                 "status":None,
                 "author":None,
                 "order":None,
@@ -48,45 +51,63 @@ class Edit(VuePy):
                 "template":None,
                 "main_image":None,
                 "toogle":self.toogle,
-                "post_type":POST_TYPE,
                 "type":"post",
+                "guid":None,
                 "models":models}
-    async def mounted(self):
+    async def edit_guid_method(self):
         vue=self.vue
-        DATA=await self.get_data()
-        content=DATA["content"] if DATA["content"] else ""
-        if not content:
-            content={}
-        
-        vue.content=content
-        vue.title=DATA["title"] if DATA["title"] else ""
-        color=(await vue.get_by_type("Color"))
-        for name,widget in color.items():
-                if "v-model" in dict(widget["options"]).keys(): 
-                    if widget["options"]["v-model"].split(".")[0]=="models":
-                        vue.models[widget["options"]["v-model"].split(".")[1]]=widget["value"]
-                    else:
-                        console.error("v-model solo se permite bajo el formato models.[name-model]")
-        vue.template=TEMPLATE
-        for elem in dict(vue["$refs"]).keys():
-            if elem.startswith("toogle-"):
-                vue["$refs"][elem]
-                vue.toogle[elem]=True
-     
-        """
-        if self.vue.post_type=="custom":
-            self.vue.content=
-        """
-        
-        vue.order=POST_ORDER
-        vue["type"]=DATA["type"]
-        """
-        if self.vue["$refs"]["editor"]:
-            console.log("dddddddd",self.vue["$refs"]["editor"]["$attrs"]["name"])
-            self.vue.content=document.querySelector(
-                "[data-name='"+self.vue["$refs"]["editor"]["$attrs"]["name"]+"']"
-                ).value
-        """
+        vue.edit_guid=False
+        console.log(vue.guid)
+        form=__new__(FormData)()
+        form.append("guid",vue.guid)
+        form.append("id",POST_ID)
+        req=await fetch("/json/posts/",{
+            "body":form,
+            "method":"PATCH"
+            })
+        data=await req.json()
+        vue.guid=data["item"]["guid"]
+    async def mounted(self):
+        if POST_ID:
+            vue=self.vue
+            DATA=await self.get_data()
+            content=DATA["content"] if DATA["content"] else ""
+            if not content:
+                content={}
+            
+            vue.content=content
+            vue.guid=DATA["guid"]
+            vue.order=POST_ORDER
+            if POST_MAIN_IMAGE:
+                vue.main_image=POST_MAIN_IMAGE
+            vue.title=DATA["title"] if DATA["title"] else ""
+            color=(await vue.get_by_type("Color"))
+            for name,widget in color.items():
+                    if "v-model" in dict(widget["options"]).keys(): 
+                        if widget["options"]["v-model"].split(".")[0]=="models":
+                            vue.models[widget["options"]["v-model"].split(".")[1]]=widget["value"]
+                        else:
+                            console.error("v-model solo se permite bajo el formato models.[name-model]")
+            vue.template=TEMPLATE
+            for elem in dict(vue["$refs"]).keys():
+                if elem.startswith("toogle-"):
+                    vue["$refs"][elem]
+                    vue.toogle[elem]=True
+         
+            """
+            if self.vue.post_type=="custom":
+                self.vue.content=
+            """
+            
+            vue.order=POST_ORDER
+            vue["type"]=DATA["type"]
+            """
+            if self.vue["$refs"]["editor"]:
+                console.log("dddddddd",self.vue["$refs"]["editor"]["$attrs"]["name"])
+                self.vue.content=document.querySelector(
+                    "[data-name='"+self.vue["$refs"]["editor"]["$attrs"]["name"]+"']"
+                    ).value
+            """
       
         def sticky():
           
@@ -126,43 +147,42 @@ class Edit(VuePy):
                 evt.target["name"]:evt.target.value
                 })
        
-
     async def publish(self):
         vue=self.vue
         form=__new__(FormData)()
         form.append("title",vue.title)
-        form.append("type",vue["type"])
+        form.append("type",POST_TYPE)
         form.append("menu_order",vue.order)
         form.append("status","publish")
-        DATA=await self.get_data()
-        if DATA["post"]:
-            form.append("id",DATA["id"])
-        if vue.post_type=="custom":
+        if POST_BUILDER=="custom":
             content=JSON.stringify(vue.content)
             form.append("content",content)
         else:
             form.append("content",vue.content)
+        __pragma__("jsiter")
         req=await fetch("/json/posts/",{
             "body":form,
             "method":"POST"
             })
+        __pragma__("nojsiter")
         if req.status==200:
             self.alert("Creado con exito")
         else:
             self.alert("A ocurrido un error","warning")
         data=await req.json()
         post=data["item"]
-       
+        vue.guid=data["item"]["guid"]
         form=__new__(FormData)()
         for elem in self.extra_data.keys():
             form.append(elem,self.extra_data[elem])
         form.append("post",post["id"])
         form.append("template",vue.template)
+        form.append("main_image",vue.main_image)
 
         __pragma__("jsiter")
         req=await fetch("/json/postmeta/",{
             "body":form,
-            "method":"PATCH" if DATA["id"]!=js_undefined else "POST"
+            "method": "POST"
             })
         __pragma__("nojsiter")
 
@@ -170,21 +190,22 @@ class Edit(VuePy):
         vue=self.vue
         form=__new__(FormData)()
         form.append("title",vue.title)
-        form.append("type",vue["type"])
+        form.append("type",POST_TYPE)
         form.append("menu_order",vue.order)
         form.append("status","trash")
         DATA=await self.get_data()
-        form.append("id",DATA["id"])
-        if vue.post_type=="custom":
+        form.append("id",POST_ID)
+        if vue.post_builder=="custom":
             content=JSON.stringify(vue.content)
             form.append("content",content)
         else:
             form.append("content",vue.content)
-      
+        __pragma__("jsiter")
         req=await fetch("/json/posts/",{
             "body":form,
-            "method":"PATCH" if DATA["id"]!=js_undefined else "POST",
+            "method":"PATCH",
             })
+        __pragma__("nojsiter")
         
         if req.status==200:
             await self.alert("Actualizado con exito")
@@ -192,6 +213,7 @@ class Edit(VuePy):
             await self.alert("A ocurrido un error","warning")
         data=await req.json()
         post=data["item"]
+        vue.guid=data["item"]["guid"]
        
         form=__new__(FormData)()
 
@@ -199,13 +221,25 @@ class Edit(VuePy):
             form.append(elem,self.extra_data[elem])
         form.append("post",post["id"])
         form.append("template",vue.template)
+        form.append("main_image",vue.main_image)
 
         __pragma__("jsiter")
         req=await fetch("/json/postmeta/",{
             "body":form,
-            "method":"PATCH" if DATA["id"]!=js_undefined else "POST"
+            "method":"PATCH"
             })
         __pragma__("nojsiter")
+    async def set_image_method(self,value):
+        vue=self.vue
+        console.log(value[0])
+        vue.main_image=value[0].src
+
+    async def main_image_method(self):
+        lib=await window.media
+        await lib.clear()
+
+        await lib.vue["$on"]("accept",await self.set_image_method)
+        s("#media_modal").modal("show")
 
     
 
@@ -222,7 +256,7 @@ class Edit(VuePy):
 
     async def update_content(self,data):
         vue=self.vue
-        console.log("aaaaaaa",vue)
+
         for elem,value in dict(data).items():
             name=elem.split(".")
             console.log([elem,value])
@@ -246,7 +280,9 @@ class Edit(VuePy):
     async def get_by_type(self,type):
         components={}  
         DATA=await self.get_data()
-        if  DATA["content"]:  
+
+        if typeof(DATA["content"])=="object":  
+
             for elem in dict(DATA["content"]).keys():
                 
                 for elem2 in dict(DATA["content"][elem]).keys():
@@ -254,13 +290,23 @@ class Edit(VuePy):
                         components[elem+"."+elem2]=DATA["content"][elem][elem2]
         return components
     async def get_data(self):
-        if "DATA" not in dir(window):
-            req=await fetch(f"/json/posts/{POST_ID}/")
-            data=await req.json()
-            item=data["item"]
-            window.DATA=item
-            item["content"]=JSON.parse(item["content"])
-            return item
-        else:
-            return DATA
+
+        if "POST_ID" in dir(window):
+            if "DATA" not in dir(window):
+                req=await fetch(f"/json/posts/{POST_ID}/")
+                data=await req.json()
+                item=data["item"]
+                window.DATA=item
+                if POST_BUILDER=="custom":
+                    try:
+                        
+                        item["content"]=JSON.parse(item["content"])
+                    except:
+
+                        item["content"]={}
+
+
+                return item
+            else:
+                return DATA
 app=Edit()

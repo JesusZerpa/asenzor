@@ -504,7 +504,10 @@ class AppConfig(AppConfig):
     def get_data_page(self,post=None):
         from asenzor.models import Post
         post=Post.objects.get(id=post)
-        page=json.loads(post.content)
+        try:
+            page=json.loads(post.content)
+        except:
+            page={}
         data={}
 
         for elem in page:
@@ -519,7 +522,13 @@ class AppConfig(AppConfig):
     def get_serializable_page(self,post=None):
         from asenzor.models import Post
         post=Post.objects.get(id=post)
-        page=json.loads(post.content)
+        if post.content:
+            try:
+                page=json.loads(post.content)
+            except:
+                page={}
+        else:
+            page={}
         data={}
         if page:
             for elem in page:

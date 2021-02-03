@@ -117,9 +117,10 @@ class PostMeta(models.Model):
 
 
 		else:
+
 			if len(query):
-				
-				setattr(query[0],key,json.dumps(value))
+
+				setattr(query[0],"value",json.dumps(value))
 				query[0].save()
 				l.append(query[0].id)
 			else:

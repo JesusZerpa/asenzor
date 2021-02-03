@@ -184,7 +184,7 @@ class PostMeta(ResourceViewRest):
         d={}
         items=[]
         for key,value in request.PATCH.items():
-            if key!="post":
+            if key!="post":      
                 
                 items=self.model.update(post,key,value)
         return JsonResponse({"_meta":[{"post":post.id}],"items":items})

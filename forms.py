@@ -336,7 +336,12 @@ class PageTemplateForm(forms.Form):
 			del kwargs["instance"]
 		super().__init__(**kwargs)
 		if self.instance:
-			self.fields["content"].initial=json.dumps(json.loads(self.instance.content),indent=2)			
+			if self.instance.content:
+				try:
+					self.fields["content"].initial=json.dumps(json.loads(self.instance.content),indent=2)
+				except Exception as e:
+					self.fields["content"].initial={}
+		
 			if error:
 				self.fields["field"].initial=widget
 

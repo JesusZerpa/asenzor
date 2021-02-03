@@ -4,11 +4,14 @@
 {%block head%}
 {{block.super}}
 <script type="text/javascript">
-	window.POST_ID={{post.id}}
+	window.POST_BUILDER='{{post_builder}}'
 	window.POST_TYPE='{{post_type}}'
+	{%if post%}
+	window.POST_ID={{post.id}}
+	window.POST_MAIN_IMAGE='{{meta.main_image}}'
 	window.TEMPLATE='{{meta.template}}'
 	window.POST_ORDER={%if post.menu_order %}{{post.menu_order}}{%else%}0{%endif%}
-
+	{%endif%}
 </script>
 {%endblock%}
 {%block content%}
@@ -88,6 +91,17 @@
 			value="{{post.title}}" 
 			class="form-control">
 	</div>
+	<div v-if="guid">
+		<div v-if="!edit_guid">
+			<a  :href="'{{BASE_URL}}'+guid">{{BASE_URL}}[[guid]]</a><button @click="edit_guid=true">Editar</button>
+		</div>
+		<div v-else>
+			<input v-model="guid" ><button @click="edit_guid_method()">Guardar</button>
+		</div>
+	
+	
+	</div>
+	
 	<div style="margin-bottom: 50px">
 		<!--
 		<pre>
@@ -243,7 +257,6 @@
 			<br>
 			<div class="card">
 				<div class="card-header">
-					<b>Imagen destacada</b>
 				</div>
 				<div class="card-body">
 					<div>
@@ -253,9 +266,9 @@
 						cursor: pointer;" 
 						v-if="main_image"
 						@click="main_image=null">X</span>
-					<img :src="main_image">	
+					<img style="max-width: 100%" :src="'{{BASE_URL}}media/'+main_image">	
 					</div>
-				<span @click="update_main_image()" style="color:lightblue;cursor: pointer;">Establecer imagen destacada</span>
+				<span @click="main_image_method()" style="color:lightblue;cursor: pointer;">Establecer imagen destacada</span>
 				</div>
 				
 			</div>	

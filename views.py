@@ -26,8 +26,8 @@ class Pages(ResourceView):
 	new_template="asenzor/post.html"
 	edit_template="asenzor/post.html"
 	custom_data={
-	"new":{"post_type":"post","templates":asenzor.get_templates()},
-	"edit":{"post_type":"custom","templates":asenzor.get_templates()},
+	"new":{"post_builder":"post","post_type":"page","templates":asenzor.get_templates()},
+	"edit":{"post_type":"page","templates":asenzor.get_templates()},
 	}
 	list_display=["title","name","status","author","modified"]
 	@classmethod
@@ -40,6 +40,14 @@ class Pages(ResourceView):
 			data["VUE_TEMPLATES"]=templates
 			data["post"]=serialize(post)
 			data["meta"]={}
+			if template:
+				page=asenzor.get_templates()[template]
+				if page:
+					data["post_builder"]="custom"
+				else:
+					data["post_builder"]="post"
+			else:
+				data["post_builder"]="post"
 			for elem in PostMeta.objects.filter(post=post):
 				if elem.key in data["meta"]:
 					if type(data["meta"][elem.key])==list:
@@ -49,14 +57,15 @@ class Pages(ResourceView):
 				else:
 					data["meta"][elem.key]=json.loads(elem.value)
 			data_content=False
-			try:
-				data["post"]["content"]=json.loads(data["post"]["content"])
-				data_content=True
-				if data["post"]["content"]==None or data["post"]["content"]=="":
-					data["post"]["content"]=asenzor.serialize_template_admin_settings(template,request) 
-			except:
-				pass
-				
+			if data["post_builder"]=="custom":
+				try:
+					data["post"]["content"]=json.loads(data["post"]["content"])
+					data_content=True
+					if data["post"]["content"]==None or data["post"]["content"]=="":
+						data["post"]["content"]=asenzor.serialize_template_admin_settings(template,request) 
+				except:
+					pass
+					
 			
 			if template and data_content:
 				data["page"]=asenzor.compile_template_admin_settings(template,request,data["post"]["content"])
@@ -95,6 +104,11 @@ class Posts(ResourceView):
 	"""docstring for Pages"""
 	model=Post
 	filter={"type":"post"}
+	custom_data={
+	"new":{"post_builder":"post","post_type":"post","templates":asenzor.get_templates()},
+	"edit":{"post_builder":"custom","post_type":"post","templates":asenzor.get_templates()},
+	}
+
 
 	
 
@@ -115,10 +129,8 @@ class Options(ResourceView):
 	def middleware(cls,view,request,data,id=None):
 		from django.apps import apps
 		asenzor=apps.get_app_config("asenzor")
-		print("uuuuuuuuu",view,request.method)
 		if request.method=="POST" and (view=="new" or view=="edit"):
 			
-			print("fffffffffffff",data["instance"].encrypted)
 			if data["instance"].encrypted:
 				data["instance"].value=asenzor.encode(data["instance"].value,asenzor.get_secret_key())
 				data["instance"].save()
@@ -355,3 +367,72 @@ def upgrade(request):
 
 		return HttpResponseRedirect(settings.ASENZOR_URL)
 	return render(request,"asenzor/layouts/dashboard.html")
+
+def dynamic_views(request):
+	"""
+	Esta son todas las listas de post con sus guid que posee asenzor
+	"""
+	from .models import Post,PostMeta,Option,Site
+	multisite=Option.get("multisite",False)
+	master=Site.get_master()
+
+	def findPage(request,model,meta,option,site,multisite=False):
+
+		for elem in model.objects.all():
+			if multisite:
+				url="/"+site.name+"/"+elem.guid
+			else:
+				url="/"+elem.guid
+
+			if request.get_full_path()== url:
+
+				if elem.type=="page":
+					try:
+						template=meta.get(elem.id,"template",site.name+"/single.html")
+
+					except:
+						template=site.name+"/single.html"
+
+
+					return {"template":template,"post":elem}
+				else:
+					return {"template":site.name+"/single.html","post":elem}
+
+				
+	if multisite:
+		import imp
+		for elem in Site.objects.all():
+			if not elem.master and request.get_full_path().startswith(elem.name):
+				PostModel=imp.load_from_source("model_"+elem.name,elem.name+"/models.py").Post
+				PostModelMeta=imp.load_from_source("model_"+elem.name,elem.name+"/models.py").PostMeta
+				OptionModel=imp.load_from_source("model_"+elem.name,elem.name+"/models.py").Option
+				data=findPage(request,elem.name+"/"+PostModel.guid,Post,PostModelMeta,OptionModel,elem,True)
+				if data:
+					return render(request,data["template"],{
+						"post":data["post"],
+						"meta":PostModelMeta
+						})
+			else:
+				data=findPage(request,Post,PostMeta,OptionModel,master,True)
+				meta={}
+				for elem in PostMeta.objects.filter(post=data["post"].id):
+					meta[elem.key]=json.loads(elem.value)
+				if data:
+					return render(request,data["template"],{
+						"post":data["post"],
+						"meta":meta
+						})
+
+	else:
+		data=findPage(request,Post,PostMeta,Option,master)
+		if data:
+			meta={}
+	
+			for elem in PostMeta.objects.filter(post=data["post"].id):
+				meta[elem.key]=json.loads(elem.value)
+			return render(request,data["template"],{
+				"post":data["post"],
+				"meta":meta
+				})
+	return HttpResponse(status=404)
+
