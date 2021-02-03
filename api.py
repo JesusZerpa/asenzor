@@ -117,7 +117,13 @@ class Plugin(ResourceViewRest):
 class Posts(ResourceViewRest):
     """docstring for Pages"""
     model=Post
+    
     def middleware(self,view,request,data):
+        from django.apps import apps
+        from .models import PostMeta
+        asenzor=apps.get_app_config("asenzor")
+        if view=="patch":
+            print("xxxxxxx",data)
         if view=="post":
             if "name" not in data:
                 name=data["title"].replace(" ","-")
@@ -137,7 +143,52 @@ class Posts(ResourceViewRest):
 
             if "author" not in data:
                 data["author"]=request.user.id
+        if view=="get":
+            template=PostMeta.get(data["id"],"template")
+          
+            data_content=False
+            conf=asenzor.get_templates()[template]
+           
+            if conf:
+                try:
+                    json.loads(data["item"]["content"])
+                except Exception as e:
+                    content=asenzor.serialize_template_admin_settings(template)
+                    data["item"]["content"]=json.dumps(content)
+               
+            """
+            if data["item"]["content"]==None or data["item"]["content"]=="":#
+                #si esta vacio
+                data["item"]["content"]=asenzor.serialize_template_admin_settings(template,request) 
 
+                data["item"]["content"]=asenzor.serialize_template_admin_settings(template,request) 
+            else:#si no esta vacio pero no tiene datos,solo la estructura
+                
+                try:
+                    data["item"]["content"]=json.loads(data["post"]["content"])
+                    data["page"]=asenzor.compile_template_admin_settings(template,request,data["post"]["content"])
+                except:
+                    #elimina el conteido y crea uno nuevo en base a la estructura
+                    data["post"]["content"]=asenzor.serialize_template_admin_settings(template,request) 
+            """
+         
+            """
+           
+          
+            try:
+               
+                data["item"]["content"]=json.loads(data["item"]["content"])
+               
+                data_content=True
+                if data["item"]["content"]==None or data["item"]["content"]=="":
+                    data["item"]["content"]=asenzor.serialize_template_admin_settings(template,request) 
+            except Exception as e:
+             
+                content=asenzor.serialize_template_admin_settings(template,request)
+                
+                data["item"]["content"]=content
+            """
+         
 
 class Support(ResourceViewRest):
     """docstring for Pages"""
@@ -168,24 +219,48 @@ class Support(ResourceViewRest):
 class PostMeta(ResourceViewRest):
     """docstring for Pages"""
     model=PostMeta
-    def put(self,request,id=None):
+
+    def post(self,request,id=None):
         post=int(request.POST.get("post"))
         post=Post.objects.get(id=post)
         d={}
         items=[]
+
         for key,value in request.POST.items():
             if key!="post":
+                print("nnnn",post,key,value)
                 items=self.model.update(post,key,value)
-        return JsonResponse({"_meta":[{"post":post}],"items":items})
+        print("vvvvvvvv",request.POST.keys())
+        return JsonResponse({"_meta":[{"post":post.id}],"items":items})
+    def put(self,request,id=None):
+        post=int(request.PUT.get("post"))
+        post=Post.objects.get(id=post)
+        d={}
+        items=[]
+        for key,value in request.PUT.items():
+            if key!="post":
+                items=self.model.update(post,key,value)
+        return JsonResponse({"_meta":[{"post":post.id}],"items":items})
     def patch(self,request,id=None):
-
+        import json
+        from django.apps import apps
+        asenzor=apps.get_app_config('asenzor')
         post=int(request.PATCH.get("post"))
         post=Post.objects.get(id=post)
         d={}
         items=[]
         for key,value in request.PATCH.items():
             if key!="post":      
-                
+                if key=="template":
+                    template=self.model.get(post,key) 
+                    if template:
+                        if post.content:
+                            try:
+                                post.content=json.dumps(post.content)
+                            except Exception as e:
+                                post.content=json.dumps(asenzor.compile_template_admin_settings(template))
+                      
+                        
                 items=self.model.update(post,key,value)
         return JsonResponse({"_meta":[{"post":post.id}],"items":items})
 

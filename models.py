@@ -73,9 +73,10 @@ class PostMeta(models.Model):
 				from django.apps import apps
 				asenzor=apps.get_app_config("asenzor")
 				value= asenzor.decode(instance.value,ansenzor.get_secret_key())
-
+			
 			if value:
 				value=json.loads(value)
+		
 			return value
 		except Exception as e:
 			print(e)
@@ -119,7 +120,7 @@ class PostMeta(models.Model):
 		else:
 
 			if len(query):
-
+			
 				setattr(query[0],"value",json.dumps(value))
 				query[0].save()
 				l.append(query[0].id)

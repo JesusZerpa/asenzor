@@ -398,18 +398,25 @@ class AppConfig(AppConfig):
         global widgets
         page=OrderedDict()
         l=[]
-
+     
         options=self.get_template(path)
-    
+        if not options:
+            return {}
+
         if type(options)==dict:
+
             for option in options:
                 page[option]={}
                 for elem in options[option]:
+                    
                     if isinstance(elem,WidgetBox) and elem.name not in l:
                         value=""
+                      
                         if post:
+
                             if elem.name in post[option]:
                                 elem.group=option
+                                
                                 for name in elem.fields:
                                     value=post[option][elem["name"]]["value"][name]
                                     if type(value)!=str:
@@ -420,7 +427,7 @@ class AppConfig(AppConfig):
                             page[option][elem.name]=elem.render_settings(request)
                             
                     elif elem["type"] in dir(forms):
-    
+                      
                         widget=getattr(forms,elem["type"])(attrs=elem["options"] if "options" in elem else {})
 
                         
@@ -440,22 +447,25 @@ class AppConfig(AppConfig):
                         page[option][elem["name"]]=widget.render(option+"."+elem["name"],value)
 
                     elif elem["type"] in dir(asenzor.widgets):
-                        
+                       
                         widget=getattr(asenzor.widgets,elem["type"])()
                         widget.attrs.update(elem["options"] if "options" in elem else {})
                         widget.attrs["name"]=option+"."+elem["name"]
                         value=""
+                      
                         if post:
-                            
+                     
                             if elem["name"] in post[option]:
                                 value=post[option][elem["name"]]["value"]
+                            
                             if type(value)!=str:
                                 value=json.dumps(value)
                         else:
                             if "value" in elem:
                                 value=elem["value"]
-               
+                       
                         widget.attrs["value"]=value
+
                         
                         page[option][elem["name"]]=widget.render(option+"."+elem["name"],value)
 
@@ -485,12 +495,16 @@ class AppConfig(AppConfig):
         return page
     def serialize_template_admin_settings(self,path,request=None):
         from asenzor.widgets import WidgetBox
+        
         options=self.get_template(path)
+      
         page={}
         l=[]
+       
         if type(options)==dict:
             for option in options:
                 page[option]={}
+
                 for elem in options[option]:
                    
                     if isinstance(elem,WidgetBox) and elem.name not in l:             

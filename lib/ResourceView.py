@@ -940,7 +940,7 @@ class ResourceViewRest(ResourceView):
         if self.model:
             
             data={k:v for k,v in request.GET.items()}
-            print("rrrrrr",self.filter)
+           
             filters.update(self.filter)
             data.update(filters)
             items=[clear_view(self.model,serialize(item),request.user) for item in self.model.objects.filter(**data)]
@@ -958,11 +958,14 @@ class ResourceViewRest(ResourceView):
         if self.model:
             try:
                 data={key:value for key,value in request.GET.items()}
+                data["id"]=id
+                data["item"]=clear_view(self.model,serialize(self.model.objects.get(**data)),request.user )
+
                 self.middleware("get",request,data)
 
-                data["id"]=id
-                return JsonResponse({"_meta":{"message":"Busqueda encontrada"},"item":clear_view(self.model,serialize(self.model.objects.get(**data)),request.user )})
+                return JsonResponse({"_meta":{"message":"Busqueda encontrada"},"item":data["item"]})
             except Exception as e:
+             
                 return JsonResponse({"_meta":{"message":"No se encontraron resultados","item":None}})
         return HttpResponse("Debe implementar el metodo 'index'")
     
@@ -995,32 +998,43 @@ class ResourceViewRest(ResourceView):
                                 data[elem.name]=l    
                             elif data[elem.name]==None:
                                 del data[elem.name] 
+
                 if request.FILES:
                     files=self.upload(request,data)
 
                     data=self.uploaded(request,data,files)
                 if self.model:
-               
-                    if "name" not in data:
-                        name=data["title"].lower()
-                    else:
-                        name=data["name"]
-                    newname=name
-                    c=1
-                    while True:
-                        try:
-                            self.model.objects.get(name=newname)
-                            newname=data["name"]+f"-{c}"
-                            c+=1
-                        except Exception as e:
+                    is_post=False
+                    for elem in self.model._meta.get_fields():
+                        if elem.name=="guid":
+                            is_post=True
                             break
+                    if is_post:
+                        name=None
+                        if "name" not in data and "title" in data:
+                            name=data["title"].lower()
+                        elif "name" in data:
+                            name=data["name"]
+                        newname=name
+                        newname.replace(" ","-")
+                        c=1
+                        while True:
+                            try:
+                                self.model.objects.get(name=newname)
+                                newname=name+f"-{c}"
+                                c+=1
+                            except Exception as e:
+                                break
                     
-                    data["name"]=newname
-                    data["guid"]=newname
-                    print("ccccccc",data)
-                    instance=self.model.objects.create(**data)
-                    #instance.save()
-                    data["item"]=clear_view(self.model,serialize(instance),request.user)
+                        data["name"]=newname
+                        data["guid"]=newname
+                        instance=self.model.objects.create(**data)
+                        #instance.save()
+                        data["item"]=clear_view(self.model,serialize(instance),request.user)
+                    else:
+                        instance=self.model.objects.create(**data)
+                        data["item"]=clear_view(self.model,serialize(instance),request.user)
+
                     self.middleware("post",request,data)
 
                     return JsonResponse({"_meta":{"message":str(instance)+" Creada con exito"},"item":data["item"]})

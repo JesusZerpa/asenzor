@@ -91,7 +91,7 @@
 			{%for elem2 in list_display%}
 
 				{%if forloop.counter0 == 0%}
-				 <td><a href="{{request.get_full_path }}{{elem.id}}">{%get_field_value forloop.counter0 model list_display elem%}</a></td>
+				 <td><a href="{{request.get_full_path }}{{elem.id}}/">{%get_field_value forloop.counter0 model list_display elem%}</a></td>
 
 				{%else%}
 				<td>{%get_field_value forloop.counter0 model list_display elem%}</td>
@@ -102,7 +102,7 @@
 			<td>
 				{% for action in actions%}
 
-				<a href="{{request.get_full_path }}{{elem.id}}/{{action.name}}" class="{{action.class}}" style="{{action.style}}">{{action.label}}</a>
+				<a href="{{request.get_full_path }}{{elem.id}}/{{action.name}}/" class="{{action.class}}" style="{{action.style}}">{{action.label}}</a>
 				{%endfor%}
 				{%if custom_actions%}
 				{{custom_actions|actions:forloop.counter0|safe}}

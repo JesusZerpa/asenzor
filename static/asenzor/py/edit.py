@@ -68,19 +68,23 @@ class Edit(VuePy):
         data=await req.json()
         vue.guid=data["item"]["guid"]
     async def mounted(self):
+        vue=self.vue
+        vue.order=POST_ORDER
         if POST_ID:
-            vue=self.vue
+            
             DATA=await self.get_data()
+       
             content=DATA["content"] if DATA["content"] else ""
             if not content:
                 content={}
             
             vue.content=content
             vue.guid=DATA["guid"]
-            vue.order=POST_ORDER
+         
             if POST_MAIN_IMAGE:
                 vue.main_image=POST_MAIN_IMAGE
             vue.title=DATA["title"] if DATA["title"] else ""
+
             color=(await vue.get_by_type("Color"))
             for name,widget in color.items():
                     if "v-model" in dict(widget["options"]).keys(): 
@@ -99,7 +103,7 @@ class Edit(VuePy):
                 self.vue.content=
             """
             
-            vue.order=POST_ORDER
+            
             vue["type"]=DATA["type"]
             """
             if self.vue["$refs"]["editor"]:
@@ -195,7 +199,7 @@ class Edit(VuePy):
         form.append("status","trash")
         DATA=await self.get_data()
         form.append("id",POST_ID)
-        if vue.post_builder=="custom":
+        if POST_BUILDER=="custom":
             content=JSON.stringify(vue.content)
             form.append("content",content)
         else:
@@ -212,6 +216,7 @@ class Edit(VuePy):
         else:
             await self.alert("A ocurrido un error","warning")
         data=await req.json()
+        window.POST_ID=data["item"]["id"]
         post=data["item"]
         vue.guid=data["item"]["guid"]
        
@@ -240,7 +245,6 @@ class Edit(VuePy):
 
         await lib.vue["$on"]("accept",await self.set_image_method)
         s("#media_modal").modal("show")
-
     
 
     async def alert(self,text,status="success"):
@@ -256,7 +260,6 @@ class Edit(VuePy):
 
     async def update_content(self,data):
         vue=self.vue
-
         for elem,value in dict(data).items():
             name=elem.split(".")
             console.log([elem,value])

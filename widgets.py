@@ -185,7 +185,8 @@ class Color(Widget):
 
 class TinyMCE(Widget):
     def render(self,name,value):
-        import html
+        import html,json
+        from copy import copy
         if ":init" not in self.attrs:
             self.attrs[":init"]="""{
              height: 500,
@@ -201,8 +202,12 @@ class TinyMCE(Widget):
                alignleft aligncenter alignright alignjustify | \
                bullist numlist outdent indent | removeformat |code insert| help"
            }"""
+        print("#############", "value" in self.attrs)
+        value=self.attrs["value"]
         if "value" in self.attrs:
+            print("|||||||||||||||||||||||||||")
             self.attrs["initial-value"]=self.attrs["value"]
-
         self.attrs["value"]=value
+        self.attrs["initial-value"]=self.attrs["value"][2:-2]
+        print("@@@@@@@@",self.attrs["name"],self.attrs["initial-value"])
         return self.template_render("<button data-target='{{widget.name}}' >Insertar medio</button><div><editor {% include 'asenzor/widgets/attrs.html'%}  @onSelectionChange='function(value){update_content({\"{{widget.attrs.name}}\":value.target.body.innerHTML})}'/></div>",name,value)

@@ -38,17 +38,25 @@ class Pages(ResourceView):
 			template=PostMeta.get(post,"template")
 			data["form"]=None
 			data["VUE_TEMPLATES"]=templates
+
 			data["post"]=serialize(post)
 			data["meta"]={}
 			if template:
-				page=asenzor.get_templates()[template]
+				templates=asenzor.get_templates()
+				if template in templates:
+					page=templates[template]
+				else:
+					page={}
+
 				if page:
 					data["post_builder"]="custom"
 				else:
 					data["post_builder"]="post"
 			else:
 				data["post_builder"]="post"
+
 			for elem in PostMeta.objects.filter(post=post):
+
 				if elem.key in data["meta"]:
 					if type(data["meta"][elem.key])==list:
 						data["meta"][elem.key].append(json.loads(elem.value))
@@ -56,20 +64,43 @@ class Pages(ResourceView):
 						data["meta"][elem.key]=[data["meta"][elem.key],json.loads(elem.value)]
 				else:
 					data["meta"][elem.key]=json.loads(elem.value)
-			data_content=False
-			if data["post_builder"]=="custom":
+
+			if data["post"]["content"]==None or data["post"]["content"]=="":
+				data["post"]["content"]=asenzor.serialize_template_admin_settings(template,request)
+				data["page"]=asenzor.compile_template_admin_settings(template,request,data["post"]["content"])
+			else:
 				try:
 					data["post"]["content"]=json.loads(data["post"]["content"])
-					data_content=True
-					if data["post"]["content"]==None or data["post"]["content"]=="":
-						data["post"]["content"]=asenzor.serialize_template_admin_settings(template,request) 
-				except:
-					pass
+					data["page"]=asenzor.compile_template_admin_settings(template,request,data["post"]["content"])
+				except Exception as e:
+					if data["post_builder"]=="custom":
+						data["post"]["content"]=asenzor.serialize_template_admin_settings(template,request)
+						data["page"]=asenzor.compile_template_admin_settings(template,request,data["post"]["content"])
+
+
 					
+			"""
+			data_content=False
+			if data["post_builder"]=="custom":
+				
+				if data["post"]["content"]==None or data["post"]["content"]=="":#
+					#si esta vacio
+					data["post"]["content"]=asenzor.serialize_template_admin_settings(template,request) 
+					
+				
+					
+					data["post"]["content"]=asenzor.serialize_template_admin_settings(template,request) 
+				else:#si no esta vacio pero no tiene datos,solo la estructura
+					
+					try:
+						data["post"]["content"]=json.loads(data["post"]["content"])
+						data["page"]=asenzor.compile_template_admin_settings(template,request,data["post"]["content"])
+					except:
+						#elimina el conteido y crea uno nuevo en base a la estructura
+						data["post"]["content"]=asenzor.serialize_template_admin_settings(template,request) 
 			
-			if template and data_content:
-				data["page"]=asenzor.compile_template_admin_settings(template,request,data["post"]["content"])
-		
+			print(data["post"]["content"])
+			"""
 			data["DATA"]["post"]=data["post"]
 			data["DATA"]["meta"]=data["meta"]
 		if view=="new":
@@ -380,10 +411,9 @@ def dynamic_views(request):
 
 		for elem in model.objects.all():
 			if multisite:
-				url="/"+site.name+"/"+elem.guid
+				url="/"+site.name+"/"+elem.guid+"/"
 			else:
-				url="/"+elem.guid
-
+				url="/"+elem.guid+"/"
 			if request.get_full_path()== url:
 
 				if elem.type=="page":
@@ -410,6 +440,7 @@ def dynamic_views(request):
 				if data:
 					return render(request,data["template"],{
 						"post":data["post"],
+						"page":asenzor.get_data_page(data["post"].id),
 						"meta":PostModelMeta
 						})
 			else:
@@ -420,6 +451,7 @@ def dynamic_views(request):
 				if data:
 					return render(request,data["template"],{
 						"post":data["post"],
+						"page":asenzor.get_data_page(data["post"].id),
 						"meta":meta
 						})
 
@@ -432,6 +464,7 @@ def dynamic_views(request):
 				meta[elem.key]=json.loads(elem.value)
 			return render(request,data["template"],{
 				"post":data["post"],
+				"page":asenzor.get_data_page(data["post"].id),
 				"meta":meta
 				})
 	return HttpResponse(status=404)

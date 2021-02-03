@@ -7,11 +7,12 @@ class TinyEditor(VuePy):
     """
     extends=Editor
     methods=["setContent"]
-    async def data(self):
+    def data(self):
 
         return {"name":self.vue["$attrs"]["name"]}
 
     async def mounted(self):
+        """
         def setInit():
             if self.vue["editor"]:
 
@@ -21,4 +22,5 @@ class TinyEditor(VuePy):
             else:
                 setTimeout(setInit,1000)
         setTimeout(setInit,1000)
+        """
 

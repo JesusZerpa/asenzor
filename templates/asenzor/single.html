@@ -11,7 +11,7 @@
         <div class="inner">
           <h1 class="cover-heading">{{post.title|safe}}</h1>
           {%if meta.main_image%}
-          <img src="{{BASE_URL}}media/{{meta.main_image}}">
+          <img src="{{BASE_URL}}media/{{meta.main_image}}" style="max-width: 400px;max-height: 400px">
           {%endif%}
          
         </div>

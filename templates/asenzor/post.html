@@ -40,7 +40,7 @@
 		position:fixed;
 	
 		top:66px;
-		max-width:1000px;
+		max-width:240px;
 		height: calc(100vh - 66px);
 		right: 0px;
 		box-shadow:0px 4px 3px rgba(0,0,0,.5);
@@ -93,7 +93,7 @@
 	</div>
 	<div v-if="guid">
 		<div v-if="!edit_guid">
-			<a  :href="'{{BASE_URL}}'+guid">{{BASE_URL}}[[guid]]</a><button @click="edit_guid=true">Editar</button>
+			<a  :href="'{{BASE_URL}}'+guid+'/'">{{BASE_URL}}[[guid]]/</a><button @click="edit_guid=true">Editar</button>
 		</div>
 		<div v-else>
 			<input v-model="guid" ><button @click="edit_guid_method()">Guardar</button>
@@ -105,7 +105,6 @@
 	<div style="margin-bottom: 50px">
 		<!--
 		<pre>
-			[[content]]
 		</pre>
 	-->
 		<input 
@@ -114,7 +113,7 @@
 			v-model="type" 
 			:ref="'type'" 
 			>
-			{%if post_type == "custom"%}
+			{%if post_builder == "custom"%}
 			{%if form%}
 			<div id="content">
 			{{form}}		
@@ -219,7 +218,7 @@
 				</div>
 				<div class="card-body">
 				<button class="btn btn-primary" @click="publish()">Publicar</button>
-				<button class="btn btn-success" @click="save()">Guardar</button>
+				<button v-if="guid" class="btn btn-success" @click="save()">Guardar</button>
 				{%if post.id%}
 				<a href="" style="color: red">Eliminar</a>
 				{%endif%}	
@@ -266,7 +265,7 @@
 						cursor: pointer;" 
 						v-if="main_image"
 						@click="main_image=null">X</span>
-					<img style="max-width: 100%" :src="'{{BASE_URL}}media/'+main_image">	
+					<img style="max-width: 200px" :src="'{{BASE_URL}}media/'+main_image">	
 					</div>
 				<span @click="main_image_method()" style="color:lightblue;cursor: pointer;">Establecer imagen destacada</span>
 				</div>
