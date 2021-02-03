@@ -61,19 +61,26 @@ class Pages(ResourceView):
 					if type(data["meta"][elem.key])==list:
 						data["meta"][elem.key].append(json.loads(elem.value))
 					else:
-						data["meta"][elem.key]=[data["meta"][elem.key],json.loads(elem.value)]
+						data["meta"][elem.key]=[
+							data["meta"][elem.key],
+							json.loads(elem.value)]
 				else:
 					data["meta"][elem.key]=json.loads(elem.value)
 
 			if data["post"]["content"]==None or data["post"]["content"]=="":
-				data["post"]["content"]=asenzor.serialize_template_admin_settings(template,request)
-				data["page"]=asenzor.compile_template_admin_settings(template,request,data["post"]["content"])
+				#si la pagina tiene un template asignado 
+				#lee la configuracion del template
+				if template: 
+					data["post"]["content"]=asenzor.serialize_template_admin_settings(template,request)
+					data["page"]=asenzor.compile_template_admin_settings(template,request,data["post"]["content"])
+			
 			else:
 				try:
 					data["post"]["content"]=json.loads(data["post"]["content"])
 					data["page"]=asenzor.compile_template_admin_settings(template,request,data["post"]["content"])
 				except Exception as e:
 					if data["post_builder"]=="custom":
+
 						data["post"]["content"]=asenzor.serialize_template_admin_settings(template,request)
 						data["page"]=asenzor.compile_template_admin_settings(template,request,data["post"]["content"])
 
@@ -404,29 +411,58 @@ def dynamic_views(request):
 	Esta son todas las listas de post con sus guid que posee asenzor
 	"""
 	from .models import Post,PostMeta,Option,Site
+	import hashlib
 	multisite=Option.get("multisite",False)
 	master=Site.get_master()
-
+	
+	
 	def findPage(request,model,meta,option,site,multisite=False):
 
 		for elem in model.objects.all():
+
 			if multisite:
 				url="/"+site.name+"/"+elem.guid+"/"
 			else:
 				url="/"+elem.guid+"/"
+			
+
 			if request.get_full_path()== url:
+				
 
-				if elem.type=="page":
-					try:
+				authenticated=True
+				template=site.name+"/single.html"
+				if elem.status=="private":
+					if request.method=="POST":
+						password=request.POST.get("_post_password")
+						users_authenticated=PostMeta.get(elem,"users_authenticated",[])
+						print([ hashlib.md5(password.encode("utf-8")).hexdigest() != elem.password, hashlib.md5(password.encode("utf-8")).hexdigest() , elem.password])
+						accept=hashlib.md5(password.encode("utf-8")).hexdigest() == elem.password
+						if not accept:
+							template="asenzor/content-authenticated.html"
+							authenticated=False
+						elif request.user.is_authenticated and request.user.id not in users_authenticated:
+							users_authenticated.append(request.user.id)
+							PostMeta.update(elem,"users_authenticated",users_authenticated,True)
+
+
+					elif request.method=="GET":
+						users_authenticated=PostMeta.get(elem,"users_authenticated",[])
+						if request.user.is_authenticated:
+							print("rrrrrrr",users_authenticated)
+							if request.user.id not in users_authenticated:
+								template="asenzor/content-authenticated.html"
+								authenticated=False
+						else:
+							template="asenzor/content-authenticated.html"
+							authenticated=False
+
+				elif elem.status=="trash" and not request.user.is_authenticated:
+					return None
+				if authenticated:
+					if elem.type=="page":
 						template=meta.get(elem.id,"template",site.name+"/single.html")
-
-					except:
-						template=site.name+"/single.html"
-
-
-					return {"template":template,"post":elem}
-				else:
-					return {"template":site.name+"/single.html","post":elem}
+				print("oooooooooo",template)	
+				return {"template":template,"post":elem}
 
 				
 	if multisite:
@@ -438,7 +474,10 @@ def dynamic_views(request):
 				OptionModel=imp.load_from_source("model_"+elem.name,elem.name+"/models.py").Option
 				data=findPage(request,elem.name+"/"+PostModel.guid,Post,PostModelMeta,OptionModel,elem,True)
 				if data:
-					return render(request,data["template"],{
+					template=data["template"]
+					if not template:
+						template=master.name+"/single.html"
+					return render(request,template,{
 						"post":data["post"],
 						"page":asenzor.get_data_page(data["post"].id),
 						"meta":PostModelMeta
@@ -448,8 +487,11 @@ def dynamic_views(request):
 				meta={}
 				for elem in PostMeta.objects.filter(post=data["post"].id):
 					meta[elem.key]=json.loads(elem.value)
+				template=data["template"]
+				if not template:
+					template=master.name+"/single.html"
 				if data:
-					return render(request,data["template"],{
+					return render(request,template,{
 						"post":data["post"],
 						"page":asenzor.get_data_page(data["post"].id),
 						"meta":meta
@@ -462,7 +504,10 @@ def dynamic_views(request):
 	
 			for elem in PostMeta.objects.filter(post=data["post"].id):
 				meta[elem.key]=json.loads(elem.value)
-			return render(request,data["template"],{
+			template=data["template"]
+			if not template:
+				template=master.name+"/single.html"
+			return render(request,template,{
 				"post":data["post"],
 				"page":asenzor.get_data_page(data["post"].id),
 				"meta":meta

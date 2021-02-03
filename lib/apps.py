@@ -495,7 +495,7 @@ class AppConfig(AppConfig):
         return page
     def serialize_template_admin_settings(self,path,request=None):
         from asenzor.widgets import WidgetBox
-        
+    
         options=self.get_template(path)
       
         page={}

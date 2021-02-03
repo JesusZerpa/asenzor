@@ -12,6 +12,7 @@ class TinyEditor(VuePy):
         return {"name":self.vue["$attrs"]["name"]}
 
     async def mounted(self):
+        
         """
         def setInit():
             if self.vue["editor"]:

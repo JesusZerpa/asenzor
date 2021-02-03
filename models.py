@@ -37,7 +37,7 @@ class Post(models.Model):
 	content=models.TextField(null=True,blank=True)
 	title=models.CharField("Titulo",max_length=250,null=True,blank=True)
 	excerpt=models.TextField(null=True,blank=True)
-	status=models.CharField("Estatus",max_length=250,null=True,blank=True)
+	status=models.CharField("Estatus",max_length=250,null=True,blank=True,default="public")
 	comment_status=models.CharField(max_length=250,null=True,blank=True)
 	ping_status=models.CharField(max_length=250,null=True,blank=True)
 	password=models.CharField(max_length=250,null=True,blank=True)
@@ -97,7 +97,7 @@ class PostMeta(models.Model):
 			instance=cls.objects.create(post=id,key=key,value=value)
 
 	@classmethod
-	def update(cls,id,key,value):
+	def update(cls,id,key,value,array=False):
 		"""
 
 		"""
@@ -105,16 +105,25 @@ class PostMeta(models.Model):
 		l=[]
 		if type(value)==list or type(value)==tuple:
 			if len(query):
+				if not array:
 
-				for k,elem in enumerate(query):
-					elem[key]=value[k]
-					l.append(elem.id)
+					for k,elem in enumerate(query):
+						elem[key]=value[k]
+						l.append(elem.id)
+				else:
+					query[0].value=json.dumps(value)
+					query[0].save()
 			else:
-				for elem in value:
+				if not array:
+					for elem in value:
 
-					instance=cls.objects.create(post=id,key=key,value=json.dumps(elem))
+						instance=cls.objects.create(post=id,key=key,value=json.dumps(elem))
 
-					l.append(instance.id)
+						l.append(instance.id)
+				else:
+					print("kkkkkkk",value)
+					instance=cls.objects.create(post=id,key=key,value=json.dumps(value))
+					
 
 
 		else:

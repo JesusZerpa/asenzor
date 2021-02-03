@@ -120,7 +120,7 @@
 			</div>
 			{%elif page%}
 			<div :ref="'panel1'">
-				<input class="search-field" type="" name="" 
+				<input class="search-field" type="search" name="" 
 				style="">
 			{%for key,group in page.items%}
 
@@ -210,7 +210,7 @@
 		<div class="col-md-4">
 			<br>
 			<div :ref="'panel2'" class="panel2">
-			<input class="search-field" type="" name="" 
+			<input class="search-field" type="search" name="" 
 				style="">
 			<div class="card">
 				<div class="card-header">
@@ -222,7 +222,23 @@
 				{%if post.id%}
 				<a href="" style="color: red">Eliminar</a>
 				{%endif%}	
+				<div >
+					<label>Estatus</label>
+				
+				<select v-model="status">
+					<option value="publish">Publico</option>
+					<option value="private">Privado</option>
+					<option value="trash">Borrador</option>
+				</select>
 				</div>
+				<div v-if="status=='private'">
+					<label>Contraseña</label>
+				<input  v-model="password" type="password" style="max-width: 100%;">	
+				</div>
+				</div>
+				
+
+				
 				
 			</div>
 			<br>

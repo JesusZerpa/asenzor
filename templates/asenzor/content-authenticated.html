@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+	{% load static %}
+	<title>Acceso no autorizado</title>
+	
+<meta name="viewport" content="width=device-width, user-scalable=no">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css'%}" />
+  
+</head>
+<body>
+<div class="container">
+	<div class="row">
+		<div class="col-md-12">
+			<form action="" method="POST">
+			{%csrf_token%}
+			<p>No tienes permitido accesar en este contenido</p>
+			<input type="password" name="_post_password">
+			<button class="btn bn-primary">Enviar</button>	
+			</form>
+			
+		</div>
+	</div>
+</div>
+</body>
+</html>

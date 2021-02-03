@@ -121,10 +121,16 @@ class Posts(ResourceViewRest):
     def middleware(self,view,request,data):
         from django.apps import apps
         from .models import PostMeta
+        import hashlib 
         asenzor=apps.get_app_config("asenzor")
         if view=="patch":
-            print("xxxxxxx",data)
+            if "password" in data and data["password"]:
+                
+                data["password"]=hashlib.md5(data["password"].encode("utf-8") ).hexdigest()
+                
         if view=="post":
+            if "password" in data and data["password"]:
+                data["password"]=hashlib.md5(data["password"].encode("utf-8")).hexdigest() 
             if "name" not in data:
                 name=data["title"].replace(" ","-")
                 newname=name
@@ -144,18 +150,17 @@ class Posts(ResourceViewRest):
             if "author" not in data:
                 data["author"]=request.user.id
         if view=="get":
+ 
             template=PostMeta.get(data["id"],"template")
-          
-            data_content=False
-            conf=asenzor.get_templates()[template]
-           
-            if conf:
-                try:
-                    json.loads(data["item"]["content"])
-                except Exception as e:
-                    content=asenzor.serialize_template_admin_settings(template)
-                    data["item"]["content"]=json.dumps(content)
-               
+            if template:
+                conf=asenzor.get_templates()[template]
+                if conf:
+                    try:
+                        json.loads(data["item"]["content"])
+                    except Exception as e:
+                        content=asenzor.serialize_template_admin_settings(template)
+                        data["item"]["content"]=json.dumps(content)
+
             """
             if data["item"]["content"]==None or data["item"]["content"]=="":#
                 #si esta vacio

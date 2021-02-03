@@ -47,12 +47,14 @@ class Edit(VuePy):
                 "status":None,
                 "author":None,
                 "order":None,
+                "password":None,
                 "type":None,
                 "template":None,
                 "main_image":None,
                 "toogle":self.toogle,
                 "type":"post",
                 "guid":None,
+                "status":"public",
                 "models":models}
     async def edit_guid_method(self):
         vue=self.vue
@@ -80,6 +82,7 @@ class Edit(VuePy):
             
             vue.content=content
             vue.guid=DATA["guid"]
+            vue.status=DATA["status"]
          
             if POST_MAIN_IMAGE:
                 vue.main_image=POST_MAIN_IMAGE
@@ -157,7 +160,9 @@ class Edit(VuePy):
         form.append("title",vue.title)
         form.append("type",POST_TYPE)
         form.append("menu_order",vue.order)
-        form.append("status","publish")
+        if vue.status=="private":
+            form.append("password",vue.password)
+        form.append("status",vue.status)
         if POST_BUILDER=="custom":
             content=JSON.stringify(vue.content)
             form.append("content",content)
@@ -180,6 +185,7 @@ class Edit(VuePy):
         for elem in self.extra_data.keys():
             form.append(elem,self.extra_data[elem])
         form.append("post",post["id"])
+
         form.append("template",vue.template)
         form.append("main_image",vue.main_image)
 
@@ -196,7 +202,9 @@ class Edit(VuePy):
         form.append("title",vue.title)
         form.append("type",POST_TYPE)
         form.append("menu_order",vue.order)
-        form.append("status","trash")
+        if vue.status=="private":
+            form.append("password",vue.password)
+        form.append("status",vue.status)
         DATA=await self.get_data()
         form.append("id",POST_ID)
         if POST_BUILDER=="custom":

@@ -202,12 +202,11 @@ class TinyMCE(Widget):
                alignleft aligncenter alignright alignjustify | \
                bullist numlist outdent indent | removeformat |code insert| help"
            }"""
-        print("#############", "value" in self.attrs)
-        value=self.attrs["value"]
+        
         if "value" in self.attrs:
-            print("|||||||||||||||||||||||||||")
+            value=self.attrs["value"]
             self.attrs["initial-value"]=self.attrs["value"]
-        self.attrs["value"]=value
-        self.attrs["initial-value"]=self.attrs["value"][2:-2]
-        print("@@@@@@@@",self.attrs["name"],self.attrs["initial-value"])
+        elif value:
+            self.attrs["value"]=value
+        
         return self.template_render("<button data-target='{{widget.name}}' >Insertar medio</button><div><editor {% include 'asenzor/widgets/attrs.html'%}  @onSelectionChange='function(value){update_content({\"{{widget.attrs.name}}\":value.target.body.innerHTML})}'/></div>",name,value)
