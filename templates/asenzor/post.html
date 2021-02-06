@@ -218,7 +218,7 @@
 				</div>
 				<div class="card-body">
 				<button class="btn btn-primary" @click="publish()">Publicar</button>
-				<button v-if="guid" class="btn btn-success" @click="save()">Guardar</button>
+				<button v-if="guid || guid==''" class="btn btn-success" @click="save()">Guardar</button>
 				{%if post.id%}
 				<a href="" style="color: red">Eliminar</a>
 				{%endif%}	
