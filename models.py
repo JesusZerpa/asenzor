@@ -44,7 +44,7 @@ class Post(models.Model):
 	modified=models.DateTimeField(max_length=250,default= timezone.now)
 	content_filtered=models.TextField(max_length=250,blank=True,null=True)
 	parent=models.ForeignKey("self",on_delete=models.CASCADE,blank=True,null=True)
-	guid=models.CharField(max_length=250,unique=True)
+	guid=models.CharField(max_length=250,unique=True,blank=True)
 	menu_order=models.IntegerField(null=True,blank=True,default=0)
 	mime_type=models.CharField(max_length=250,blank=True,null=True)
 	comment_count=models.IntegerField(null=True,blank=True,default=0)
