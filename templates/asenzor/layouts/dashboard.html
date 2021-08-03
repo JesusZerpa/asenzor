@@ -88,7 +88,6 @@
 	</header>
 
 {%block content%}
-
 <div class="container" style="padding-top: 10px">
 
   {%for card in cards%}
@@ -135,10 +134,11 @@
     </div>
   </div>
 </div>
-
+<!-- Se cargan los scripts de otras apps a traves del filto footer-->
 {% apply_filter "footer" request %}
-{%for script in scripts%}
 
+<!-- Se cargan scripts extras propios de la aplicacion actual-->
+{%for script in scripts%}
 <script type="module" src=/{{script}}></script>
 {%endfor%}
 

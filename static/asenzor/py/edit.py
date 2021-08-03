@@ -20,7 +20,6 @@ window.VUE_COMPONENTS["asenzor"]["color"]=Color().__component__
 
 Vue=require("vue")["default"]
 
-
 class Edit(VuePy):
     """docstring for MyAoo"""   
     methods=["publish","save","update_from_widget",
@@ -75,6 +74,7 @@ class Edit(VuePy):
         if POST_ID:
             
             DATA=await self.get_data()
+            console.log("qqqqq",DATA)
        
             content=DATA["content"] if DATA["content"] else ""
             if not content:
@@ -95,6 +95,7 @@ class Edit(VuePy):
                             vue.models[widget["options"]["v-model"].split(".")[1]]=widget["value"]
                         else:
                             console.error("v-model solo se permite bajo el formato models.[name-model]")
+            console.log("YYYYYYY",content)
             vue.template=TEMPLATE
             for elem in dict(vue["$refs"]).keys():
                 if elem.startswith("toogle-"):
@@ -305,18 +306,19 @@ class Edit(VuePy):
         if "POST_ID" in dir(window):
             if "DATA" not in dir(window):
                 req=await fetch(f"/json/posts/{POST_ID}/")
-                data=await req.json()
-                item=data["item"]
-                window.DATA=item
-                if POST_BUILDER=="custom":
-                    try:
-                        
-                        item["content"]=JSON.parse(item["content"])
-                    except:
+                if (req.status==200):
+                    data=await req.json()
+                    item=data["item"]
+                    window.DATA=item
+                    if POST_BUILDER=="custom":
+                        try:
+                            
+                            item["content"]=JSON.parse(item["content"])
+                        except:
 
-                        item["content"]={}
-
-
+                            item["content"]={}
+                else:
+                    console.error("Error al obtener los datos:",req)
                 return item
             else:
                 return DATA

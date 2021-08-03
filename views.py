@@ -26,8 +26,11 @@ class Pages(ResourceView):
 	new_template="asenzor/post.html"
 	edit_template="asenzor/post.html"
 	custom_data={
-	"new":{"post_builder":"post","post_type":"page","templates":asenzor.get_templates()},
-	"edit":{"post_type":"page","templates":asenzor.get_templates()},
+	"new":{"post_builder":"post",
+		   "post_type":"page",
+		   "templates":asenzor.get_templates()},
+	"edit":{"post_type":"page",
+			"templates":asenzor.get_templates()},
 	}
 	list_display=["title","name","status","author","modified"]
 	@classmethod
@@ -143,8 +146,12 @@ class Posts(ResourceView):
 	model=Post
 	filter={"type":"post"}
 	custom_data={
-	"new":{"post_builder":"post","post_type":"post","templates":asenzor.get_templates()},
-	"edit":{"post_builder":"custom","post_type":"post","templates":asenzor.get_templates()},
+	"new":{"post_builder":"post",
+		   "post_type":"post",
+		   "templates":asenzor.get_templates()},
+	"edit":{"post_builder":"custom",
+			"post_type":"post",
+			"templates":asenzor.get_templates()},
 	}
 
 

@@ -4,7 +4,7 @@
       "main": "./asenzor/py/main.py"
     },
     "output": {
-      "path": "/home/zerpa/workspace/dj-woodridge/ybor/asenzor/static/asenzor/dist",
+      "path": "/home/zerpa/workspace/dj-woodridge/woodridge/asenzor/static/asenzor/dist",
       "filename": "[name].js"
     }
   }

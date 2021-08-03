@@ -6,13 +6,14 @@ class MainConfig(AppConfig):
     name = 'asenzor'
     ejecutado=False
     plugins=[]
-    compile=["webpack"]
+    compile=["webpack","sass"]
     __version__="0.1.0"
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.settings["webpack"]["entry"]["main"]="./asenzor/py/main.py"
         self.load_plugins()
         self.register_template("asenzor/single.html",None)
+    
         
 
     def load_plugins(self):

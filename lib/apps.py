@@ -6,6 +6,30 @@ from copy import copy
 from uuid import uuid4
 import subprocess
 import json
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
+
+def compile_webpack(name):
+    if os.path.exists(name+"/static/webpack.dev.js") and settings.DEBUG:
+        print("compilando webpack...",name)
+        import subprocess
+        proc = subprocess.Popen(
+            ["npx","webpack","--config","webpack.dev.js"],
+            stdout=subprocess.PIPE,
+            cwd=name+"/static/"
+        )
+        print(proc.communicate()[0].decode("utf-8"))
+        return proc
+
+class MyEventHandler(FileSystemEventHandler):
+    def __init__(self,app):
+        self.app=app
+    def on_modified(self, event):
+        #esto porque tambien se registra la modificacion de la carpeta
+        if event.src_path.endswith(".py"):
+            compile_webpack(self.app)
+
+        print(event.src_path, "modificado.")
 
 
 def get_process():
@@ -96,6 +120,7 @@ class ValueAttr(json.JSONEncoder):
 
 templates={}
 widgets={}
+process=[]
 
 class AppConfig(AppConfig):
     """docstring for """
@@ -125,10 +150,9 @@ class AppConfig(AppConfig):
         super().__init__(*args,**kwargs)
         if os.path.exists(self.name+'/settings.json'):
             with open(self.name+'/settings.json') as f:
-                settings=f.read()
-                if settings:
-                    self.settings=json.loads(settings)
-
+                _settings=f.read()
+                if _settings:
+                    self.settings=json.loads(_settings)
 
 
         self.settings["webpack"]["output"]["path"]=os.path.abspath("./"+self.name+'/static/'+self.name+'/dist/')
@@ -138,7 +162,11 @@ class AppConfig(AppConfig):
         from asenzor.signals import app_loaded
         app_loaded.connect(receiver=self.load_requests)
         app_loaded.connect(receiver=self.load_actions)
-                
+      
+        if self.name in settings.COMPILE_APPS_WEBPACK:
+            self.webpack()
+        if self.name in settings.COMPILE_APPS_SASS:
+            self.sass()    
     
     
     def ready(self):
@@ -258,89 +286,57 @@ class AppConfig(AppConfig):
 
 
     def register_process(self,proc):        
-        with open(self.name+"/.block") as f:
-            process=f.read()
-        with open(self.name+"/.block","w") as f:
-            f.write(process+str(proc.pid)+"\n")
-    ''' 
+        global process
+        process.append(proc)
+    
     def webpack(self):
         """
         Dada el nombre de la aplicacion se procede a crear el archivo de mezcla 
         para el webpack, esto es asi porque se espera que se compile cuando por 
         la url se accesa a un slug que pertenesca a dicha aplicacion
         """
-        if sys.argv[1]=="runserver":
-        
-            with open(self.name+'/settings.json',"w") as f:
-                f.write(json.dumps(self.settings,indent=2))
-
-            def webpack_compile():
-                if os.path.exists(self.name+"/static/webpack.config.js") and settings.DEBUG and self.can_compile:
-                    print("compilando webpack...")
-                    import subprocess
-                    proc = subprocess.Popen(
-                        ['cd '+self.name+'/static/ && npx webpack --config webpack.config.js --watch'],
-                        shell=True,
-                        stdout=subprocess.PIPE,
-                    )
-                    return proc
-
-            if not self.is_blocked('cd '+self.name+'/static/ && npx webpack --config webpack.config.js --watch'):
-                proc=webpack_compile()
-                self.register_process(proc)
-                thread=threading.Thread(target=show_proc,args=(proc,))
-                self.threads.append(thread)
-                thread.start()
-    '''
     
-    """
-    def sass(self,path=""):
         if sys.argv[1]=="runserver":
-            def sass_compile():
-                if settings.DEBUG and self.can_compile:
-                    print("compilando sass...")
-            
-                    import subprocess
-                    proc = subprocess.Popen(
-                        ['cd '+self.name+'/static/'+path+' && sass --watch sass:css'],
-                        shell=True,
-                        stdout=subprocess.PIPE,
-                    )
-                    return proc
+            if os.environ.get('RUN_MAIN'):
+        
+                self.observer = Observer()
+             
+                
 
-            if not self.is_blocked('cd '+self.name+'/static/'+path+' && sass --watch sass:css'):
-                proc=sass_compile()
-                self.register_process(proc)
-                thread=threading.Thread(target=show_proc,args=(proc,))
+                for (dirpath, dirnames, filenames) in os.walk("./"+self.name+"/static/"+self.name+"/py/"):
+                    self.observer.schedule(MyEventHandler(self.name),
+                    dirpath)
+                    
+                self.observer.start()
+                def alive():
+                    try:
+                        while self.observer.is_alive():
+                            self.observer.join(1)
+                    except KeyboardInterrupt:
+                        self.observer.stop()
+                    self.observer.join()
+                
+        
+                """      
+                """  
+                thread=threading.Thread(target=alive)
                 self.threads.append(thread)
                 thread.start()
-    """
-    def sass(self,path=""):
+                
+    def sass(self):
         if sys.argv[1]=="runserver":
-            def sass_compile():
-                if settings.DEBUG and self.can_compile:
-                    print("compilando sass...")
-                    lastmodified=os.stat(self.name+'/static/'+path).st_mtime
-                    while True:
-                        if lastmodified!=os.stat(self.name+'/static/'+path).st_mtime:
-                            import subprocess
-                            proc = subprocess.Popen(
-                                ['cd '+self.name+'/static/'+path+' && sass --watch sass:css'],
-                                shell=True,
-                                stdout=subprocess.PIPE,
-                            )
-                            lastmodified=os.stat(self.name+'/static/'+path).st_mtime
-                        time.sleep(1)
-
-                    self.register_process(proc)
-                    #return proc
+            import subprocess
+            proc = subprocess.Popen(
+                ["sass","--watch",f"{self.name}/scss:{self.name}/css"],
+                stdout=subprocess.PIPE,
+                cwd=self.name+'/static/'
+            )
+            self.register_process(proc)
             """
-            if not self.is_blocked('cd '+self.name+'/static/'+path+' && sass --watch sass:css'):
-                #proc=sass_compile()
-            """ 
             thread=threading.Thread(target=sass_compile)
             self.threads.append(thread)
             thread.start()
+            """
     def register_template(self,path,options,overwrite=False):
         """
         Este metodo esta pensado para los posts de paginas las cuales se les
