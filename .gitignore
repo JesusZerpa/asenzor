@@ -1,6 +1,7 @@
 __pycache__/*
 templatetags/__pycache__/*
 plugins/__pycache__/*
+static/node_modules/
 migrations/__pycache__/*
 lib/__pycache__/*
 settings.json
