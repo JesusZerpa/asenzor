@@ -8,17 +8,24 @@ import subprocess
 import json
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
+import re,shutil
+def compile_webpack(name,path):
+    pattern=name+"/static/"+name+r"/py/(\w+)/"
+    print("***********")
+    print(path)
+    print(name+"/static/"+name+r"/py/(\w+)")
+    folder=re.findall(name+"/static/"+name+r"/py/(\w+)",path)[0]
+    if os.path.exists(name+"/static/"+name+"/py/"+folder+"/webpack.dev.js"):
+        print("compilando webpack...",name,path)
 
-def compile_webpack(name):
-    if os.path.exists(name+"/static/webpack.dev.js") and settings.DEBUG:
-        print("compilando webpack...",name)
         import subprocess
         proc = subprocess.Popen(
             ["npx","webpack","--config","webpack.dev.js"],
             stdout=subprocess.PIPE,
-            cwd=name+"/static/"
+            cwd=name+"/static/"+name+"/py/"+folder
         )
         print(proc.communicate()[0].decode("utf-8"))
+        shutil.move(name+"/static/"+name+"/py/"+folder+"/dist/"+folder+".js", name+"/static/"+name+"/dist/"+folder+".js")
         return proc
 
 class MyEventHandler(FileSystemEventHandler):
@@ -27,7 +34,7 @@ class MyEventHandler(FileSystemEventHandler):
     def on_modified(self, event):
         #esto porque tambien se registra la modificacion de la carpeta
         if event.src_path.endswith(".py"):
-            compile_webpack(self.app)
+            compile_webpack(self.app,event.src_path)
 
         print(event.src_path, "modificado.")
 
@@ -304,8 +311,13 @@ class AppConfig(AppConfig):
                 
 
                 for (dirpath, dirnames, filenames) in os.walk("./"+self.name+"/static/"+self.name+"/py/"):
-                    self.observer.schedule(MyEventHandler(self.name),
-                    dirpath)
+                    
+                    if not ("node_modules" in dirpath or 
+                        "__target__" in dirpath or 
+                        "/dist" in dirpath ):
+
+                        self.observer.schedule(MyEventHandler(self.name),
+                        dirpath)
                     
                 self.observer.start()
                 def alive():

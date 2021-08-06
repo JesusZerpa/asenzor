@@ -1,0 +1,8 @@
+{
+	"version": 3,
+	"file": "components.image_select.js",
+	"sources": [
+		"components.image_select.py"
+	],
+	"mappings": "AAAA;AACA;AAAA;AADA;AAEA;AAAA;AACA;AACA;AACA;AACA;AACA;AACA;AAAA;AACA;AAEA;AACA;AAAA;AACA;AACA;AACA;AAAA;AACA;AACA;AACA;AACA;AACA;AACA;AAAA;AAAA;AACA;AACA;AAAA;AACA;AAAA;AAKA;AACA;AACA;AACA;AACA;AACA;AAAA;AAAA;AAjCA"
+}

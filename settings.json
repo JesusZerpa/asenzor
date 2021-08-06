@@ -1,10 +1,11 @@
 {
   "webpack": {
     "entry": {
+      "devtools": "./asenzor/py/devtools.py",
       "main": "./asenzor/py/main.py"
     },
     "output": {
-      "path": "/home/zerpa/workspace/dj-woodridge/woodridge/asenzor/static/asenzor/dist",
+      "path": "./asenzor/dist",
       "filename": "[name].js"
     }
   }

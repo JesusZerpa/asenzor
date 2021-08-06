@@ -921,7 +921,7 @@ class ResourceViewRest(ResourceView):
                 raise  e
     @csrf_exempt
     def api(self,request,id=None):
-
+        print("######",request.method)
         if request.method=="GET" and id:
             return self.get(request,id)
         if request.method=="GET":
@@ -978,7 +978,7 @@ class ResourceViewRest(ResourceView):
         
         if self.model:
             if request.body:
-                
+              
                 if request.headers["Content-Type"]=="application/json":
                     data=json.loads(request.body)  
                 else:
@@ -1041,6 +1041,7 @@ class ResourceViewRest(ResourceView):
 
             else:
                 return JsonResponse({"_meta":{"message":" No se proporcionaron los datos para crear el registro"},"item":None})
+    
         return HttpResponse("Debe implementar el metodo 'show'")
     def put(self,request,id=None,):
         """
