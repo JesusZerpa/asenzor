@@ -181,6 +181,7 @@ class Color(Widget):
     component_template="asenzor/widgets/color.html"
     def render(self,name,value):
         return self.template_render("<el-color-picker {% include 'asenzor/widgets/attrs.html'%} show-alpha></el-color-picker/>",name,value)
+        #return self.template_render("<color-picker {% include 'asenzor/widgets/attrs.html'%} ></color-picker>",name,value)
 
 
 class TinyMCE(Widget):
@@ -209,4 +210,4 @@ class TinyMCE(Widget):
         elif value:
             self.attrs["value"]=value
         
-        return self.template_render("<button data-target='{{widget.name}}' >Insertar medio</button><div><editor {% include 'asenzor/widgets/attrs.html'%}  @onSelectionChange='function(value){update_content({\"{{widget.attrs.name}}\":value.target.body.innerHTML})}'/></div>",name,value)
+        return self.template_render("<button data-target='{{widget.name}}' @click='open_modal()' class='btn'>Insertar medio</button><div><editor {% include 'asenzor/widgets/attrs.html'%}  @onSelectionChange='function(value){update_content({\"{{widget.attrs.name}}\":value.target.body.innerHTML})}'/></div>",name,value)

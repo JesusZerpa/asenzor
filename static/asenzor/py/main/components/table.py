@@ -4,7 +4,9 @@ class ToolBar(VuePy):
 	"""docstring for Toolbar"""
 	methods=["open_modal"]
 	def open_modal(self):
-		s("#media_modal").modal("show")
+		modal=M.instance(document.querySelector("#media_modal"))
+		modal.open()
+		
 
 class Table(VuePy):
 	"""docstring for Table"""

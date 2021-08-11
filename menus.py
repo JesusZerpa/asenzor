@@ -1,14 +1,14 @@
 
 from django.conf import settings
 menus={"ADMIN_MENU":[
-		["Formularios",settings.ASENZOR_URL+"forms/","Forms.index",None,[]],
-		["Paginas",settings.ASENZOR_URL+"pages/","Pages.index",None,[]],
-		["Configuracion de paginas",settings.ASENZOR_URL+"page-template/","PageTemplate.index",None,[]],
-		["Entradas",settings.ASENZOR_URL+"posts/","Posts.index",None,[]],
-		["Medios",settings.ASENZOR_URL+"media/","Media.index",None,[]],
-		["Plugins",settings.ASENZOR_URL+"plugins/","Plugins.index",None,[]],
-		["Atencion al cliente",settings.ASENZOR_URL+"support/","Support.index",None,[]],
-		["Ajustes",settings.ASENZOR_URL+"options/","Options.index",None,[]],
+		["Formularios",settings.ASENZOR_URL+"forms/","Forms.index","view_list",[]],
+		["Paginas",settings.ASENZOR_URL+"pages/","Pages.index","web",[]],
+		["Configuracion de paginas",settings.ASENZOR_URL+"page-template/","PageTemplate.index","dashboard",[]],
+		["Entradas",settings.ASENZOR_URL+"posts/","Posts.index","post_add",[]],
+		["Medios",settings.ASENZOR_URL+"media/","Media.index","perm_media",[]],
+		["Plugins",settings.ASENZOR_URL+"plugins/","Plugins.index","settings_suggest",[]],
+		["Atencion al cliente",settings.ASENZOR_URL+"support/","Support.index","support",[]],
+		["Ajustes",settings.ASENZOR_URL+"options/","Options.index","settings",[]],
 
 		],
 	   "ADMIN_NAVBAR":[

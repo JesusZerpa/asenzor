@@ -190,6 +190,8 @@ class UserMeta(models.Model):
 			instance=cls.objects.create(user=user,name=key,value=value,encrypted=encrypted)
 			instance.save()
 			return instance
+	def __str__(self):
+		return f"UserMeta[{self.id}]: {self.key} - {self.user.username}"
 
 
 class Comment(models.Model):

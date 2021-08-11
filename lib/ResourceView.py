@@ -181,7 +181,7 @@ class ResourceView(object):
     warnings=[]
     filter={}
 
-    actions=[{"label":"Editar","name":"edit","class":"btn btn-primary"},{"label":"Eliminar","name":"delete","class":"btn btn-danger"}]
+    actions=[{"label":"Editar","name":"edit","class":"btn"},{"label":"Eliminar","name":"delete","class":"btn red"}]
     
 
     enable_custom_actions=False
@@ -218,11 +218,11 @@ class ResourceView(object):
         for k,elem in enumerate(self.btns):  
 
             if len(elem)<3:
-                self.btns[k]=list(elem)+["btn btn-primary"]
+                self.btns[k]=list(elem)+["btn "]
             elif len(elem)<4:
                 self.btns[k]=list(self.btns[k])
                 if elem[2]==None:
-                    self.btns[k]+=["btn btn-primary","get"]
+                    self.btns[k]+=["btn","get"]
                 
                 #name,url,class,method
 

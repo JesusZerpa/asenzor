@@ -43,7 +43,6 @@ class Edit(VuePy):
         return {"content": "",
                 "title": "",
                 "edit_guid":False,
-                "status":None,
                 "author":None,
                 "order":None,
                 "password":None,
@@ -83,40 +82,35 @@ class Edit(VuePy):
             vue.content=content
             vue.guid=DATA["guid"]
             vue.status=DATA["status"]
+            console.log("FFFFFFFFFFF",vue.status)
          
             if POST_MAIN_IMAGE:
                 vue.main_image=POST_MAIN_IMAGE
             vue.title=DATA["title"] if DATA["title"] else ""
 
             color=(await vue.get_by_type("Color"))
+            console.log("XXXXXXXX",color)
             for name,widget in color.items():
                     if "v-model" in dict(widget["options"]).keys(): 
+                        console.log("*************")
                         if widget["options"]["v-model"].split(".")[0]=="models":
+                            console.log("++++++++++")
                             vue.models[widget["options"]["v-model"].split(".")[1]]=widget["value"]
                         else:
+                            console.log("MMMMMMM")
                             console.error("v-model solo se permite bajo el formato models.[name-model]")
-            console.log("YYYYYYY",content)
+      
             vue.template=TEMPLATE
             for elem in dict(vue["$refs"]).keys():
+
                 if elem.startswith("toogle-"):
                     vue["$refs"][elem]
                     vue.toogle[elem]=True
          
-            """
-            if self.vue.post_type=="custom":
-                self.vue.content=
-            """
-            
+        
             
             vue["type"]=DATA["type"]
-            """
-            if self.vue["$refs"]["editor"]:
-                console.log("dddddddd",self.vue["$refs"]["editor"]["$attrs"]["name"])
-                self.vue.content=document.querySelector(
-                    "[data-name='"+self.vue["$refs"]["editor"]["$attrs"]["name"]+"']"
-                    ).value
-            """
-      
+        """
         def sticky():
           
             altura = s('.panel2').offset().top;
@@ -132,14 +126,38 @@ class Edit(VuePy):
         
     
         s(document).ready(sticky)
-     
+        """
  
 
-    def update_from_widget(self,evt,value,name):
+    async def update_from_widget(self,evt,value,name):
         """
         Este metodo de pruena esta diseñado para actualizar la informacion
         desde elementos de widgets normales de django, deberia usarse con @change
         """
+        
+        if await self.get_type(name)=="Color":
+            """
+            Esto es un parche que funciona al que el color 
+            se cambie solo al color del comienzo al hacer click 
+            fuera 
+            """
+            node=document.querySelector(f"[name='{name}'] .el-color-picker__color-inner")
+            def callback(mutations):
+                node.style.backgroundColor=value
+                observer.disconnect();
+            observer = __new__(MutationObserver)(callback);
+            options = {
+                "childList": True,
+                "attributes": True,
+            };
+            observer.observe(node,options);
+            
+
+            node.style.backgroundColor=value
+            self.vue.models[name.split(".")[1]]=value
+    
+        
+
         if name:
             console.log({
                 name:value
@@ -253,26 +271,22 @@ class Edit(VuePy):
         await lib.clear()
 
         await lib.vue["$on"]("accept",await self.set_image_method)
-        s("#media_modal").modal("show")
+        modal=M.Modal.getInstance(document.querySelector("#media_modal"))
+        modal.open()
+
+
     
 
-    async def alert(self,text,status="success"):
-        node=s("""<div id="alert" class="alert alert-dismissible fade show" style="position: fixed;top:20px;right: 20px" role="alert">
-          {}
-          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>""".format(text))
-        node.addClass("alert-"+status)
+    async def alert(self,text,status=""):
 
-        s(document.body).append(node)
+        M.toast({"html":text,
+                 "class":status})
 
     async def update_content(self,data):
         vue=self.vue
         for elem,value in dict(data).items():
             name=elem.split(".")
-            console.log([elem,value])
-     
+          
             if len(name)==2:
 
                 vue.content[name[0]][name[1]]["value"]=value
@@ -287,6 +301,16 @@ class Edit(VuePy):
                 return DATA["content"][name[0]][name[1]]["value"]
             elif len(name)==3:
                 return DATA["content"][name[0]][name[1]]["value"][name[2]]
+        else:
+            return None
+    async def get_type(self,name):  
+        DATA=await self.get_data()
+        if DATA["content"]:  
+            name=name.split(".")
+            if len(name)==2:
+                return DATA["content"][name[0]][name[1]]["type"]
+            elif len(name)==3:
+                return DATA["content"][name[0]][name[1]]["value"][name[2]]["type"]
         else:
             return None
     async def get_by_type(self,type):

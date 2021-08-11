@@ -32,5 +32,6 @@ class ImageSelect(VuePy):
 		lib=await media
 		console.log(lib)
 		lib.vue["$on"]("accept",await self.preview)
-		s("#media_modal").modal("show")
+		modal=M.Modal.getInstance(document.querySelector("#media_modal"))
+		modal.open()
 		

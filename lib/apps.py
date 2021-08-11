@@ -411,12 +411,15 @@ class AppConfig(AppConfig):
         if not options:
             return {}
 
+
         if type(options)==dict:
 
             for option in options:
                 page[option]={}
+                
                 for elem in options[option]:
                     
+                      
                     if isinstance(elem,WidgetBox) and elem.name not in l:
                         value=""
                       
@@ -431,7 +434,9 @@ class AppConfig(AppConfig):
                                         value=json.dumps(value)
                                     elem.value[name]=value
                                 page[option][elem.name]=elem.render_settings(request)
+                            
                         else:
+                           
                             page[option][elem.name]=elem.render_settings(request)
                             
                     elif elem["type"] in dir(forms):
@@ -453,6 +458,7 @@ class AppConfig(AppConfig):
                                 
                         widget.attrs["value"]=value
                         page[option][elem["name"]]=widget.render(option+"."+elem["name"],value)
+                       
 
                     elif elem["type"] in dir(asenzor.widgets):
                        
@@ -473,7 +479,7 @@ class AppConfig(AppConfig):
                                 value=elem["value"]
                        
                         widget.attrs["value"]=value
-
+                        
                         
                         page[option][elem["name"]]=widget.render(option+"."+elem["name"],value)
 
@@ -493,10 +499,10 @@ class AppConfig(AppConfig):
                             if "value" in elem:
                                 value=elem["value"]
                          
-                                
+        
                         widget.attrs["value"]=value
                         page[option][elem["name"]]=widget.render(option+"."+elem["name"],value)
-                        
+             
 
                         
 

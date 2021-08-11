@@ -36,6 +36,7 @@ function clone(obj) {
 """)
 draggable=require('vuedraggable')
 
+
 Vue.component("draggable",draggable)
 class VuePy:
 	"""docstring for VuePy"""

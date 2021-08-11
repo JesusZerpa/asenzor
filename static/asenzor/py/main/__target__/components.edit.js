@@ -1,4 +1,4 @@
-// Transcrypt'ed from Python, 2021-08-06 12:50:52
+// Transcrypt'ed from Python, 2021-08-10 23:59:17
 import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __proxy__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 import {Color} from './components.colorpicker.js';
 import {Embeded} from './components.embeded.js';
@@ -34,7 +34,7 @@ export var Edit =  __class__ ('Edit', [VuePy], {
 	});},
 	get data () {return __get__ (this, function (self) {
 		var models = dict ({});
-		return dict ({'content': '', 'title': '', 'edit_guid': false, 'status': null, 'author': null, 'order': null, 'password': null, 'type': null, 'template': null, 'main_image': null, 'toogle': self.toogle, 'type': 'post', 'guid': null, 'status': 'public', 'models': models});
+		return dict ({'content': '', 'title': '', 'edit_guid': false, 'author': null, 'order': null, 'password': null, 'type': null, 'template': null, 'main_image': null, 'toogle': self.toogle, 'type': 'post', 'guid': null, 'status': 'public', 'models': models});
 	});},
 	get edit_guid_method () {return __get__ (this, async function (self) {
 		var vue = self.vue;
@@ -60,22 +60,26 @@ export var Edit =  __class__ ('Edit', [VuePy], {
 			vue.content = content;
 			vue.guid = DATA ['guid'];
 			vue.status = DATA ['status'];
+			console.log ('FFFFFFFFFFF', vue.status);
 			if (POST_MAIN_IMAGE) {
 				vue.main_image = POST_MAIN_IMAGE;
 			}
 			vue.title = (DATA ['title'] ? DATA ['title'] : '');
 			var color = await vue.get_by_type ('Color');
+			console.log ('XXXXXXXX', color);
 			for (var [py_name, widget] of color.py_items ()) {
 				if (__in__ ('v-model', dict (widget ['options']).py_keys ())) {
+					console.log ('*************');
 					if (widget ['options'] ['v-model'].py_split ('.') [0] == 'models') {
+						console.log ('++++++++++');
 						vue.models [widget ['options'] ['v-model'].py_split ('.') [1]] = widget ['value'];
 					}
 					else {
+						console.log ('MMMMMMM');
 						console.error ('v-model solo se permite bajo el formato models.[name-model]');
 					}
 				}
 			}
-			console.log ('YYYYYYY', content);
 			vue.template = TEMPLATE;
 			for (var elem of dict (vue ['$refs']).py_keys ()) {
 				if (elem.startswith ('toogle-')) {
@@ -85,22 +89,20 @@ export var Edit =  __class__ ('Edit', [VuePy], {
 			}
 			vue ['type'] = DATA ['type'];
 		}
-		var sticky = function () {
-			var altura = $ ('.panel2').offset ().top;
-			var altura = $ ('.navbar').offset ().top;
-			var py_switch = function () {
-				if ($ (window).scrollTop () > altura) {
-					$ ('.panel2').addClass ('panel2-fixed');
-				}
-				else {
-					$ ('.panel2').removeClass ('panel2-fixed');
-				}
-			};
-			$ (window).on ('scroll', py_switch);
-		};
-		$ (document).ready (sticky);
 	});},
-	get update_from_widget () {return __get__ (this, function (self, evt, value, py_name) {
+	get update_from_widget () {return __get__ (this, async function (self, evt, value, py_name) {
+		if (await self.get_type (py_name) == 'Color') {
+			var node = document.querySelector ("[name='{}'] .el-color-picker__color-inner".format (py_name));
+			var callback = function (mutations) {
+				node.style.backgroundColor = value;
+				observer.disconnect ();
+			};
+			var observer = new MutationObserver (callback);
+			var options = dict ({'childList': true, 'attributes': true});
+			observer.observe (node, options);
+			node.style.backgroundColor = value;
+			self.vue.models [py_name.py_split ('.') [1]] = value;
+		}
 		if (py_name) {
 			console.log (dict ([[py_name, value]]));
 			self.update_content (dict ([[py_name, value]]));
@@ -194,21 +196,19 @@ export var Edit =  __class__ ('Edit', [VuePy], {
 		var lib = await window.media;
 		await lib.py_clear ();
 		await lib.vue ['$on'] ('accept', await self.set_image_method);
-		$ ('#media_modal').modal ('show');
+		var modal = M.Modal.getInstance (document.querySelector ('#media_modal'));
+		modal.open ();
 	});},
 	get alert () {return __get__ (this, async function (self, text, status) {
 		if (typeof status == 'undefined' || (status != null && status.hasOwnProperty ("__kwargtrans__"))) {;
-			var status = 'success';
+			var status = '';
 		};
-		var node = $ ('<div id="alert" class="alert alert-dismissible fade show" style="position: fixed;top:20px;right: 20px" role="alert">\n          {}\n          <button type="button" class="close" data-dismiss="alert" aria-label="Close">\n            <span aria-hidden="true">&times;</span>\n          </button>\n        </div>'.format (text));
-		node.addClass ('alert-' + status);
-		$ (document.body).append (node);
+		M.toast (dict ({'html': text, 'class': status}));
 	});},
 	get update_content () {return __get__ (this, async function (self, data) {
 		var vue = self.vue;
 		for (var [elem, value] of dict (data).py_items ()) {
 			var py_name = elem.py_split ('.');
-			console.log ([elem, value]);
 			if (len (py_name) == 2) {
 				vue.content [py_name [0]] [py_name [1]] ['value'] = value;
 			}
@@ -226,6 +226,21 @@ export var Edit =  __class__ ('Edit', [VuePy], {
 			}
 			else if (len (py_name) == 3) {
 				return DATA ['content'] [py_name [0]] [py_name [1]] ['value'] [py_name [2]];
+			}
+		}
+		else {
+			return null;
+		}
+	});},
+	get get_type () {return __get__ (this, async function (self, py_name) {
+		var DATA = await self.get_data ();
+		if (DATA ['content']) {
+			var py_name = py_name.py_split ('.');
+			if (len (py_name) == 2) {
+				return DATA ['content'] [py_name [0]] [py_name [1]] ['type'];
+			}
+			else if (len (py_name) == 3) {
+				return DATA ['content'] [py_name [0]] [py_name [1]] ['value'] [py_name [2]] ['type'];
 			}
 		}
 		else {

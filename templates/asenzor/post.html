@@ -77,20 +77,21 @@
 	</script>
 	{%endfor%}
 
-<div id="edit_app" class="container" style="background: rgb(241, 241, 241)">
+<div id="edit_app" class="container-fluid" style="background: rgb(241, 241, 241)">
 
 	
 	<div class="row">
-		<div class="col-md-8">
+		<div class="col m8 s12">
 			<br>
 	<div class="form-group">
 		<input 
 			v-model.trim="title" 
-			type="" 
+			type="text" 
 			name="title" 
 			:ref="'title'"
 			value="{{post.title}}" 
-			class="form-control">
+			class="form-control" 
+			required>
 	</div>
 	<div v-if="guid">
 		<div v-if="!edit_guid">
@@ -121,38 +122,15 @@
 			</div>
 			{%elif page%}
 			<div :ref="'panel1'">
-				<input class="search-field" type="search" name="" 
+				<input placeholder="Buscar..." type="search" name="" 
 				style="">
+			<ul class="collapsible">
 			{%for key,group in page.items%}
-
-			<div class="card" >
-				<div class="card-header" :ref="'toogle-{{forloop.counter0}}'" @click="toogle['toogle-{{forloop.counter0}}']=!toogle['toogle-{{forloop.counter0}}']"
-				data-toggle="collapse" href="#collapse{{key}}" role="button" 
-				{%if forloop.counter0 == 0 %}
-				aria-expanded="true" 
-				{%else%}
-				aria-expanded="false"
-				{%endif%}
-
-				aria-controls="collapseExample"
-				style="display: flex;flex-direction: row; justify-content: space-between;" 
-				 >{{key}} 
-				 <div>
-			<span class="btn" style="
-			background: url('{{BASE_URL}}static/img/arrowup.png');
-			background-repeat: no-repeat;
-			background-size: contain;"> 
-			</span>
-			<span class="btn" style="
-				background: url('{{BASE_URL}}static/img/arrowdown.png');
-				background-repeat: no-repeat;
-				background-size: contain;">
-			</span> 	
-				 </div>
-				</div>
-			<div  id="collapse{{key}}"  class="card-body collapse {%if forloop.counter0 == 0 %} show {%endif%}" v-if="toogle['toogle-{{forloop.counter0}}']">
-			{%for name,item in group.items%}
-			<div style="display: inline-block;">
+			<li>
+			<div class="collapsible-header"><i class="material-icons">build</i>{{key}}</div>
+			<div class="collapsible-body">
+				{%for name,item in group.items%}
+		
 			<div>
 			<label>{{name}}</label>	
 			</div>
@@ -160,12 +138,18 @@
 			{{item}}		
 			</div>
 				
-			</div>
+		
 			
 			{%endfor%}
-			</div></div>
-			{%endfor%}
+
 			</div>
+
+
+			<li>
+			{%endfor%}
+			<ul>
+			</div>
+			<!-- -->
 			{%endif%}
 		
 		
@@ -208,16 +192,16 @@
 	
    </div>	
 		</div>
-		<div class="col-md-4">
+		<div class="col m4">
 			<br>
 			<div :ref="'panel2'" class="panel2">
-			<input class="search-field" type="search" name="" 
+			<input placeholder="Buscar..." type="search"
 				style="">
 			<div class="card">
-				<div class="card-header">
+				<div class="card-title">
 					<b>Publicar</b>
 				</div>
-				<div class="card-body">
+				<div class="card-content">
 				<button class="btn btn-primary" @click="publish()">Publicar</button>
 				<button v-if="guid || guid==''" class="btn btn-success" @click="save()">Guardar</button>
 				{%if post.id%}
@@ -226,16 +210,21 @@
 				<div >
 					<label>Estatus</label>
 				
-				<select v-model="status">
+				
+				<div>
+					<select v-model="status">
 					<option value="publish">Publico</option>
 					<option value="private">Privado</option>
 					<option value="trash">Borrador</option>
 				</select>
-				</div>
 				<div v-if="status=='private'">
 					<label>Contraseña</label>
 				<input  v-model="password" type="password" style="max-width: 100%;">	
+				</div>	
 				</div>
+				</div>
+				
+				
 				</div>
 				
 
@@ -244,17 +233,17 @@
 			</div>
 			<br>
 			<div class="card">
-				<div class="card-header">
+				<div class="card-title">
 					<b>Atributos de página</b>
 				</div>
-				<div class="card-body">
+				<div class="card-content">
 					<div>
 				<label>Orden</label>
 				
 				<input  
 					v-model="order"  
 					:ref="'order'" 
-					type="" 
+					type="number" 
 					name="" 
 					style="max-width: 50px;" >		
 					</div>
@@ -272,9 +261,9 @@
 			</div>
 			<br>
 			<div class="card">
-				<div class="card-header">
+				<div class="card-title">
 				</div>
-				<div class="card-body">
+				<div class="card-content">
 					<div>
 						<span style="
 						position: absolute;

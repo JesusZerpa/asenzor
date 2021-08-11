@@ -2,7 +2,7 @@
 {% load static %}
 {% load custom_filters%}
 {%block head%}
-<link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap-tagsinput.css'%}">
+
 <link rel="stylesheet" type="text/css" href="{% static 'css/simple-sidebar.css'%}">
 <link rel="stylesheet" type="text/css" href="{% static 'asenzor/css/index.css'%}">
 <!-- import CSS -->
@@ -13,7 +13,7 @@
 		
 	}
 </style>
-<script type="text/javascript" src="{% static 'js/bootstrap-tagsinput.min.js' %}"></script>
+
 <script src="https://cdn.tiny.cloud/1/b09tt8f829lohvfejyj3w3hknkp0f0sazoh4r1s73sszb6pt/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
 
 <script>
@@ -25,67 +25,57 @@
 </script>
 {%endblock%}
 {%block main%}
+  <ul id="slide-out" class="sidenav ">
+    <li><div class="user-view">
+      <div class="background">
+        <img src="https://materializecss.com/images/office.jpg">
+      </div>
+      <a href="#user"><img class="circle" src="{{'foto'|get_usermeta:user}}"></a>
+      <a href="#name"><span class="white-text name">{{user.get_username}}</span></a>
+      <a href="#email"><span class="white-text email">{{user.email}}</span></a>
+    </div></li>
+ 
+    {%for item in ADMIN_MENU%}
+    <li><a href="{{item.0}}"><i class="material-icons">{{item.2}}</i>{{item.1}}</a></li>
+    {%endfor%}
 
+  </ul>
+  
+        
+<nav>
+    <div class="nav-wrapper blue darken-4">
+      
+      <a href="#" >
+      Asenzor</a>
+      <a href="#" data-target="slide-out" class="sidenav-trigger" style="display: inline-block;"><i class="material-icons">menu</i></a>
+      <ul id="nav-mobile" class="right hide-on-med-and-down">
+
+        {%for item in ADMIN_NAVBAR%}
+      <li><a href="{{item.0}}" style="color:white">{{item.1}}</a></li>
+      {%endfor%}
+      
+      <a class='dropdown-trigger btn' href='#' data-target='dropdown1'>{{user.get_username}}</a>
+      <!-- Dropdown Structure -->
+      <ul id='dropdown1' class='dropdown-content'>
+        <li><a href="{{ASENZOR_URL}}user/{{user.id}}/edit/">Edit</a></li>
+        <li><a href="{{BASE_URL}}admin/logout">Cerrar session</a></li>
+ 
+        <li class="divider" tabindex="-1"></li>
+        <li class="nav-link" ><a href="{{ASENZOR_URL}}wiki/index.html">Acerca de</a></li>
+    
+      </ul>
+
+        
+      </ul>
+    </div>
+  </nav>
 
 
 <div class="d-flex" id="wrapper">
 
- <sidebar class="bg-light border-right"  id="sidebar-wrapper">
-<div class="sidebar-heading" >
-    <div style="max-width: 180px">
-      <div class="text-center" style="border: solid;
-    border-width: 1px;
-    border-color: gray;
-    border-radius: 12px;">
-        <img style="width: 80px" src="{{BASE_URL}}static/img/logo-asenzor.png">
-      </div>
-        
-        <a href="{{BASE_URL}}dashboard/">Asenzor v0.1.0</a>
-    <span style="color:green">Beta</span>
-  <!-- <a href="{{BASE_URL}}notifications">0</a>--> 
-    </div>
-</div>
 
- <div  id="sidemenu" class="list-group list-group-flush">
-<input id="search_module" name="" placeholder="Buscar modulo..." onkeydown="{self.search(event)}"> 
-
-{%for item in ADMIN_MENU%}
-<a href="{{item.0}}" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span>{{item.1}}</a>
-{%endfor%}
-</div> 
-</sidebar>
 <div id="page-content-wrapper">
-	<header>
-	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-   <button class="btn btn-primary" id="menu-toggle" style="height: 50px"></button>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
-  <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
-    <ul class="nav navbar-nav">
-      {%for item in ADMIN_NAVBAR%}
-      <li><a href="{{item.0}}" class="list-group-item list-group-item-action bg-dark" style="color:white"><span class="glyphicon glyphicon-user"></span>{{item.1}}</a></li>
-      {%endfor%}
 
-      <li class="navbar-right">
-      </li>
-
-      <li class="navbar-right">
-      <li class="dropdown">
-        <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown" role="button" aria-expanded="false"><span class="glyphicon glyphicon-info-sign"></span> <img style="width: 30px;height: 30px;" src="http://2.gravatar.com/avatar/29e63267f1362fb2c616473593a30dab?s=26&d=mm&r=g">{{user.get_username}}<span class="caret"></span></a>
-          <ul class="dropdown-menu" role="menu">
-            <li class="nav-link" ><a href="{{ASENZOR_URL}}user/{{user.id}}/edit/">Editar perfil</a></li>
-            <li class="nav-link" ><a href="{{ASENZOR_URL}}wiki/index.html">ayuda</a></li>
-            <li class="nav-link" ><a href="{{BASE_URL}}admin/logout">Cerrar session</a></li>
-          </ul>
-      </li>
-      
-      </li>
-    </ul>
- 
-  </div>
-</nav>
-	</header>
 
 {%block content%}
 <div class="container" style="padding-top: 10px">
@@ -93,10 +83,10 @@
   {%for card in cards%}
     <div class="card" >
     
-    <div class="card-header">
+    <div class="card-title">
       {{card.title}}   
     </div>
-    <div class="card-body">
+    <div class="card-content">
       {{card.message}}
     </div>
   </div>
@@ -141,8 +131,25 @@
 {%for script in scripts%}
 <script type="module" src=/{{script}}></script>
 {%endfor%}
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<script src="https://unpkg.com/element-ui@2.15.5/lib/index.js"></script>
 <script src="{%static 'asenzor/dist/main.js'%}"></script>
+<script>
+  M.AutoInit();
+  setTimeout(()=>{
+    let selects=document.querySelectorAll(".select-wrapper select")
+    for (let select of selects){
+     
+      if (select.options.selectedIndex!=-1){
+        let name= select.options[select.options.selectedIndex].innerHTML;
+        select.parentNode.querySelector("input").value=name
+      }
+      
+    }
+  },1000)
+  
+        
+</script>
 {%endblock%}
 
 {%block footer%}

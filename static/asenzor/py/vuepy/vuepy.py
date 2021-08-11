@@ -36,6 +36,7 @@ function clone(obj) {
 """)
 draggable=require('vuedraggable')
 
+
 Vue.component("draggable",draggable)
 class VuePy:
 	"""docstring for VuePy"""
@@ -45,10 +46,12 @@ class VuePy:
 	delimiters=['[[', ']]']
 	__deployed__=False
 	__link__=False
-	async def __init__(self,*args,**kwargs):
+	async def __init__(self,settings={}):
 		data={"methods":{},
 			  "watch":{},
 			  "compute":{}}
+		data.update(settings)
+
 		
 
 		for elem in dir(self):

@@ -335,7 +335,8 @@ class Media(VuePy):
                 if img.id==int(self.vue["$refs"][elem][0].id):
                     selected.push(img)
         self.vue["$emit"]("accept",selected)
-        s("#media_modal").modal("hide")
+        modal=M.getinstance(document.querySelector("#media_modal"))
+        modal.close()
         await self.off()
 
 
