@@ -24,7 +24,8 @@ class Edit(VuePy):
     """docstring for MyAoo"""   
     methods=["publish","save","update_from_widget",
              "update_content","get_content","get_by_type",
-             "edit_guid_method","main_image_method"]
+             "edit_guid_method","main_image_method",
+             "open_modal"]
     components=window.VUE_COMPONENTS["asenzor"]
     content=""
     js_type=None
@@ -273,6 +274,26 @@ class Edit(VuePy):
         await lib.vue["$on"]("accept",await self.set_image_method)
         modal=M.Modal.getInstance(document.querySelector("#media_modal"))
         modal.open()
+    def insertContent(self,id,value):
+        console.log("zzzzzzz",value)
+        for elem in value:
+            tinyMCE.js_get(id
+                ).execCommand(
+                'mceInsertContent', False, f"<img src='/media/{elem.src}'>");
+            
+        pass    
+    async def open_modal(self,event):
+        lib=await window.media
+        type=await self.get_type(event.target.dataset.target)
+      
+        if type=="TinyMCE":
+            id=event.target.nextSibling.children[0].id
+            await lib.vue["$on"]("accept",lambda value:self.insertContent(id,value))
+        await lib.clear()
+
+        modal=M.Modal.getInstance(document.querySelector("#media_modal"))
+        modal.open()
+        pass
 
 
     

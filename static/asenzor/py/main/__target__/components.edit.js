@@ -1,4 +1,4 @@
-// Transcrypt'ed from Python, 2021-08-10 23:59:17
+// Transcrypt'ed from Python, 2021-08-11 02:19:42
 import {AssertionError, AttributeError, BaseException, DeprecationWarning, Exception, IndexError, IterableError, KeyError, NotImplementedError, RuntimeWarning, StopIteration, UserWarning, ValueError, Warning, __JsIterator__, __PyIterator__, __Terminal__, __add__, __and__, __call__, __class__, __envir__, __eq__, __floordiv__, __ge__, __get__, __getcm__, __getitem__, __getslice__, __getsm__, __gt__, __i__, __iadd__, __iand__, __idiv__, __ijsmod__, __ilshift__, __imatmul__, __imod__, __imul__, __in__, __init__, __ior__, __ipow__, __irshift__, __isub__, __ixor__, __jsUsePyNext__, __jsmod__, __k__, __kwargtrans__, __le__, __lshift__, __lt__, __matmul__, __mergefields__, __mergekwargtrans__, __mod__, __mul__, __ne__, __neg__, __nest__, __or__, __pow__, __pragma__, __proxy__, __pyUseJsNext__, __rshift__, __setitem__, __setproperty__, __setslice__, __sort__, __specialattrib__, __sub__, __super__, __t__, __terminal__, __truediv__, __withblock__, __xor__, abs, all, any, assert, bool, bytearray, bytes, callable, chr, copy, deepcopy, delattr, dict, dir, divmod, enumerate, filter, float, getattr, hasattr, input, int, isinstance, issubclass, len, list, map, max, min, object, ord, pow, print, property, py_TypeError, py_iter, py_metatype, py_next, py_reversed, py_typeof, range, repr, round, set, setattr, sorted, str, sum, tuple, zip} from './org.transcrypt.__runtime__.js';
 import {Color} from './components.colorpicker.js';
 import {Embeded} from './components.embeded.js';
@@ -18,7 +18,7 @@ window.VUE_COMPONENTS ['asenzor'] ['color'] = Color ().__component__;
 export var Vue = require ('vue') ['default'];
 export var Edit =  __class__ ('Edit', [VuePy], {
 	__module__: __name__,
-	methods: ['publish', 'save', 'update_from_widget', 'update_content', 'get_content', 'get_by_type', 'edit_guid_method', 'main_image_method'],
+	methods: ['publish', 'save', 'update_from_widget', 'update_content', 'get_content', 'get_by_type', 'edit_guid_method', 'main_image_method', 'open_modal'],
 	components: window.VUE_COMPONENTS ['asenzor'],
 	content: '',
 	type: null,
@@ -198,6 +198,27 @@ export var Edit =  __class__ ('Edit', [VuePy], {
 		await lib.vue ['$on'] ('accept', await self.set_image_method);
 		var modal = M.Modal.getInstance (document.querySelector ('#media_modal'));
 		modal.open ();
+	});},
+	get insertContent () {return __get__ (this, function (self, id, value) {
+		console.log ('zzzzzzz', value);
+		for (var elem of value) {
+			tinyMCE.get (id).execCommand ('mceInsertContent', false, "<img src='/media/{}'>".format (elem.src));
+		}
+		// pass;
+	});},
+	get open_modal () {return __get__ (this, async function (self, event) {
+		var lib = await window.media;
+		var py_metatype = await self.get_type (event.target.dataset.target);
+		if (py_metatype == 'TinyMCE') {
+			var id = event.target.nextSibling.children [0].id;
+			await lib.vue ['$on'] ('accept', (function __lambda__ (value) {
+				return self.insertContent (id, value);
+			}));
+		}
+		await lib.py_clear ();
+		var modal = M.Modal.getInstance (document.querySelector ('#media_modal'));
+		modal.open ();
+		// pass;
 	});},
 	get alert () {return __get__ (this, async function (self, text, status) {
 		if (typeof status == 'undefined' || (status != null && status.hasOwnProperty ("__kwargtrans__"))) {;

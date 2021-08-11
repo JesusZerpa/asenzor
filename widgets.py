@@ -210,4 +210,4 @@ class TinyMCE(Widget):
         elif value:
             self.attrs["value"]=value
         
-        return self.template_render("<button data-target='{{widget.name}}' @click='open_modal()' class='btn'>Insertar medio</button><div><editor {% include 'asenzor/widgets/attrs.html'%}  @onSelectionChange='function(value){update_content({\"{{widget.attrs.name}}\":value.target.body.innerHTML})}'/></div>",name,value)
+        return self.template_render("<button data-target='{{widget.name}}' @click='open_modal' class='btn'>Insertar medio</button><div><editor {% include 'asenzor/widgets/attrs.html'%}  @onSelectionChange='function(value){update_content({\"{{widget.attrs.name}}\":value.target.body.innerHTML})}'/></div>",name,value)
