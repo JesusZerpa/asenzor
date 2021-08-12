@@ -1,0 +1,189 @@
+{% extends "asenzor/layouts/dashboard.html" %}
+{%load static%}
+{%load  custom_filters%}
+
+
+{%block head%}
+{{block.super}}
+<link rel="stylesheet" type="text/css" href="{% static 'css/simple-sidebar.css'%}">
+{%endblock%}
+
+
+{%block content%}
+<div id="toolbar">
+	{%if toolbar.btn_media_enabled%}
+	<button @click="open_modal()">Subir archivo</button>
+	{%endif%}
+	{% apply_filter 'table_toolbar' ''%}
+</div>
+
+<div class="container" id="support_app" inline-template>
+	<div class="row">
+		<div class="col-md-12">
+			<h3>{{title}}</h3>
+	{%if description%}
+	<pre>{{description}}</pre>
+	{%endif%}
+
+	<div id="warnings">
+		{%for warning in warnings%}
+		<div class="alert {{warning.0}}">{{warning.1}}<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>
+		{%endfor%}
+	</div>
+	<div class="container" id="support">
+		<div class="row">
+			<div class="col-md-6">
+				<img v-if="parner" :src="parner.img">
+			</div>
+			<div class="col-md-6">
+			<div class="form-group">
+			<label>Codigo del Parner</label>
+			<input class="form-control" :ref="'parner_token'" type="" value="" disabled="" @change="update_token()">
+			<button class="btn btn-primary" @click="change()">Cambiar</button>
+			</div v-html="parner.description">
+			<!-- Tarjeta de presentación y contacto -->	
+			<div>
+				
+			</div>
+			</div>
+			
+			
+		</div>
+	</div>
+	
+	
+	
+	{%if enable_btn_create%}
+	<a href="{{request.get_full_path }}new/" class="btn btn-primary">{{btn_new}}</a>
+	{%endif%}
+	{%if enable_btn_back%}
+	<a href="{{request.get_full_path }}new/" class="btn btn-primary">{{btn_back}}</a>
+	{%endif%}
+	{%for btn in btns%}
+	<a href="{{btn.0}}" class="{{btn.2}}"
+	data-type="{{btn.3}}"
+	>
+	{{btn.1}}</a>
+	{%endfor%}
+	{%for btn in btns_custom%}
+	<button href="{{btn.href}}" class="{{btn.class}}"
+	{%if btn.id%}
+	id="{{btn.id}}"
+	{%endif%}
+	>
+	{{btn.label}}</button>
+	{%endfor%}
+
+	<div class="table-responsive">
+	<form method="GET" action="" >
+		<input type="search" name="q" placeholder="Busqueda" class="form-control">
+</form>
+
+<div id="table" data-json="{{json_controller}}" >
+	{% csrf_token %}
+	{{list_display}}
+	<table class="table" >
+		<thead>
+		<tr>
+			<th>
+			<input type="checkbox" name="id" onclick="{self.marcar(event)}">
+			</th>
+			{%for elem2 in list_display%}	
+			<th>
+				
+				
+				
+			</th>
+			{% endfor %}
+			{%if actions%}
+			<th>
+				Acciones
+			</th>
+			{%endif%}
+		</tr>
+	</thead>
+	<tbody>
+
+		{%for elem in object_list%}
+		
+		<tr>
+			
+			<td><input type="checkbox" name="id:{{elem.id}}"></td>
+			{%for elem2 in list_display%}
+
+				{%if forloop.counter0 == 0%}
+				 <td><a href="{{request.get_full_path }}{{elem.id}}">{%get_field_value forloop.counter0 model list_display elem%}</a></td>
+
+				{%else%}
+				<td>{%get_field_value forloop.counter0 model list_display elem%}</td>
+				{%endif%}
+
+			{%endfor%}
+			{%if actions%}
+			<td>
+				{% for action in actions%}
+
+				<a href="{{request.get_full_path }}{{elem.id}}/{{action.name}}" class="{{action.class}}" style="{{action.style}}">{{action.label}}</a>
+				{%endfor%}
+				{%if custom_actions%}
+				{{custom_actions|actions:forloop.counter0|safe}}
+
+			
+				{%endif%}
+
+				{%if btnsformat%}
+				{{btnsformat|actions:forloop.counter0|safe}}
+				{%endif%}
+			</td>
+			{%endif%}
+
+		</tr>
+		{%endfor%}
+		</tbody>
+	</table>
+	<input id="delete" type="button" name="action" value="delete" class="btn btn-danger" onclick="{self.delete(event)}">
+</div>
+<nav aria-label="...">
+  <ul class="pagination justify-content-end">
+    <li class="page-item disabled">
+      <a class="page-link" href="#" tabindex="-1">Previous</a>
+    </li>
+    
+    {%for num in num_pages%}
+    {%if page_current == num %}
+    <li class="page-item active">
+      <a class="page-link" href="#">{{page_current}}
+      
+      <span class="sr-only">(current)</span>
+      
+      </a>
+
+    </li>
+    {%else%}
+    <li class="page-item">
+      <a class="page-link" href="?{{page_param}}={{num}}&{{params}}">{{num}}
+      </a>
+
+    </li>
+     {%endif%}
+    {%endfor%}
+    
+    <li class="page-item">
+      <a class="page-link" href="#">Next</a>
+    </li>
+  </ul>
+</nav>
+	</div>
+			
+		</div>
+		
+	</div>
+	
+</div>
+
+{% include "asenzor/widgets/media.html"%}
+
+
+
+{%endblock%}
+

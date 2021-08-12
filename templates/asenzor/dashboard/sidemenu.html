@@ -1,0 +1,142 @@
+ 
+ {% block sidemenu%}
+ <sidebar class="bg-light border-right"  id="sidebar-wrapper">
+<div class="sidebar-heading" >
+    <div style="max-width: 180px">
+        <a href="{{BASE_URL}}dashboard/">Pandora Agent v0.1</a>
+    <span style="color:green">Normal</span>
+    <a href="{{BASE_URL}}notifications">0</a>
+    </div>
+</div>
+
+ <div  id="sidemenu" class="list-group list-group-flush">
+<input id="search_module" name="" placeholder="Buscar modulo..." onkeydown="{self.search(event)}"> 
+
+{%for item in ADMIN_MENU%}
+<a href="{{item.0}}" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span>{{item.1}}</a>
+{%endfor%}
+
+{%if perms.main.view_process%}
+        <a href="{{BASE_URL}}processes/" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span>Procesos</a>
+{%endif%}
+{%if perms.main.view_activity%}
+<a href="{{BASE_URL}}activities" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span>Actividades</a>
+{%endif%}
+{%if perms.main.view_project%}
+<a href="{{BASE_URL}}projects" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span>Proyectos</a>
+{%endif%}
+{%if perms.main.view_action%}
+<a href="{{BASE_URL}}actions/" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span>Acciones</a>
+{%endif%}
+{%if perms.main.view_consulte%}
+<a href="{{BASE_URL}}consultes/" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span> Consultas</a>
+{%endif%}
+{%if perms.main.view_task%}
+<a href="{{BASE_URL}}tasks/" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span> Tareas</a>
+{%endif%}
+{%if perms.main.view_step%}
+<a href="{{BASE_URL}}steps/" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span> Pasos</a>
+{%endif%}
+{%if perms.main.view_investigation%}
+<a href="{{BASE_URL}}investigations/" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span> Investigaciones</a>
+{%endif%}
+{%if perms.main.view_case%}
+<a href="{{BASE_URL}}cases/" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span> Casos</a>
+{%endif%}        
+{%if perms.main.view_solution%}
+<a href="{{BASE_URL}}solutions/" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span> Soluciones</a>
+{%endif%}
+{%if perms.main.view_solve%}        
+<a href="{{BASE_URL}}solvers/" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span> Solucionadores</a>
+{%endif%}      
+{%if perms.main.view_conexion%}
+<a href="{{BASE_URL}}conexions/" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span> Conexiones</a>
+{%endif%}
+{%if perms.main.view_problem%}
+<a href="{{BASE_URL}}problems/" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span>Problemas</a>
+{%endif%}       
+{%if perms.main.view_script%}
+<a href="{{BASE_URL}}scripts/" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span> Scripts</a>
+{%endif%}     
+{%if perms.main.view_appsbuilder%}
+<a href="{{BASE_URL}}appsbuilder/" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span> Apps builder</a>
+{%endif%}
+
+<a href="{{BASE_URL}}language/train-words/" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span>Palabras desconocidas</a>   
+<a href="{{BASE_URL}}phrases-context/" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span>Frases contextuales</a>
+{%if perms.main.view_imagination%}      
+        <a href="{{BASE_URL}}imagination/" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span>Procesamiento de imagenes</a>
+{%endif%}
+{%if perms.main.view_restriction%}
+        <a href="{{BASE_URL}}restrictions/" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span>Restricciones</a>
+{%endif%}    
+{%if perms.main.view_intent%}
+        <a href="{{BASE_URL}}intents/" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span>Intenciones</a>
+{%endif%}      
+{%if perms.main.view_intentprhases%}
+        <a href="{{BASE_URL}}intent-phrases/" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span>Frases intencionadas</a>
+{%endif%}
+{%if perms.main.view_tried%}  
+        <a href="{{BASE_URL}}trieds/" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span>Intentos</a>
+{%endif%}
+{%if perms.main.view_entity%}
+        <a href="{{BASE_URL}}entities/" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span>Entidades</a>
+{%endif%}      
+{%if perms.main.view_learning%}
+        <a href="{{BASE_URL}}learning/" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span>Aprendizaje</a>
+{%endif%}     
+{%if perms.main.view_attention%}
+        <a href="{{BASE_URL}}attention/" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span>Prestar atención</a>
+{%endif%}       
+
+        <a href="{{BASE_URL}}language/read/" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span>Leer</a>
+{%if perms.main.view_request%}     
+        <a href="{{BASE_URL}}requests/" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span>Solicitudes de requerimientos</a>
+{%endif%}
+{%if perms.main.view_reaction%}
+        <a href="{{BASE_URL}}reactions/" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span>Reacciones</a>
+{%endif%}     
+{%if perms.main.view_interaction%}
+        <a href="{{BASE_URL}}interactions/" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span>Interacciones</a>
+{%endif%}      
+
+        <a href="{{BASE_URL}}gestures/" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span>Gestos</a>
+{%if perms.main.view_question%}       
+        <a href="{{BASE_URL}}questions/" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span>Preguntas</a>
+{%endif%}        
+{%if perms.main.view_dialog%}
+        <a href="{{BASE_URL}}dialogs/" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span>Dialogos</a>
+{%endif%}
+{%if perms.main.view_semantic%}
+        <a href="{{BASE_URL}}semantic" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span>Semantica</a>
+{%endif%}
+
+{%if perms.main.view_soul%}
+        <a href="{{BASE_URL}}souls" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span>Almas</a>
+{%endif%}        
+{%if perms.main.view_design%}
+        <a href="{{BASE_URL}}design" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span>Diseños</a>
+{%endif%}        
+{%if perms.main.change_useroption%}
+<a href="{{BASE_URL}}option" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span>Opciones del usuario</a>
+{%endif%}   
+
+{%if perms.main.change_optiongroup%}
+<a href="{{BASE_URL}}settings" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span>Configuracion</a>
+{%endif%}      
+
+<a href="{{BASE_URL}}selenium" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span>Selenium</a>  
+
+<a href="{{BASE_URL}}workmanager" class="list-group-item list-group-item-action bg-light"><span class="glyphicon glyphicon-user"></span>WorkManager</a>  
+
+
+      </div> 
+</sidebar>
+{%endblock%}
+
+
+
+
+<script>
+
+</script>

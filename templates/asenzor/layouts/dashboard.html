@@ -1,0 +1,161 @@
+{%extends "asenzor/layouts/base.html"%}
+{% load static %}
+{% load custom_filters%}
+{%block head%}
+
+<link rel="stylesheet" type="text/css" href="{% static 'css/simple-sidebar.css'%}">
+<link rel="stylesheet" type="text/css" href="{% static 'asenzor/css/index.css'%}">
+<!-- import CSS -->
+<link rel="stylesheet" href="{%static 'node_modules/element-ui/lib/theme-chalk/index.css'%}">
+<style type="text/css">
+	.bootstrap-tagsinput .tag{
+		color:gray;
+		
+	}
+</style>
+
+<script src="https://cdn.tiny.cloud/1/b09tt8f829lohvfejyj3w3hknkp0f0sazoh4r1s73sszb6pt/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+
+<script>
+	window.BASE_URL='{{BASE_URL}}'
+  window.ASENZOR_URL='{{ASENZOR_URL}}'
+	window.BASE_URL_FULL='{{BASE_URL_FULL}}'
+  window.VUE_COMPONENTS={"asenzor":{}}
+
+</script>
+{%endblock%}
+{%block main%}
+  <ul id="slide-out" class="sidenav ">
+    <li><div class="user-view">
+      <div class="background">
+        <img src="https://materializecss.com/images/office.jpg">
+      </div>
+      <a href="#user"><img class="circle" src="{{'foto'|get_usermeta:user}}"></a>
+      <a href="#name"><span class="white-text name">{{user.get_username}}</span></a>
+      <a href="#email"><span class="white-text email">{{user.email}}</span></a>
+    </div></li>
+ 
+    {%for item in ADMIN_MENU%}
+    <li><a href="{{item.0}}"><i class="material-icons">{{item.2}}</i>{{item.1}}</a></li>
+    {%endfor%}
+
+  </ul>
+  
+        
+<nav>
+    <div class="nav-wrapper blue darken-4">
+      
+      <a href="#" >
+      Asenzor</a>
+      <a href="#" data-target="slide-out" class="sidenav-trigger" style="display: inline-block;"><i class="material-icons">menu</i></a>
+      <ul id="nav-mobile" class="right hide-on-med-and-down">
+
+        {%for item in ADMIN_NAVBAR%}
+      <li><a href="{{item.0}}" style="color:white">{{item.1}}</a></li>
+      {%endfor%}
+      
+      <a class='dropdown-trigger btn' href='#' data-target='dropdown1'>{{user.get_username}}</a>
+      <!-- Dropdown Structure -->
+      <ul id='dropdown1' class='dropdown-content'>
+        <li><a href="{{ASENZOR_URL}}user/{{user.id}}/edit/">Edit</a></li>
+        <li><a href="{{BASE_URL}}admin/logout">Cerrar session</a></li>
+ 
+        <li class="divider" tabindex="-1"></li>
+        <li class="nav-link" ><a href="{{ASENZOR_URL}}wiki/index.html">Acerca de</a></li>
+    
+      </ul>
+
+        
+      </ul>
+    </div>
+  </nav>
+
+
+<div class="d-flex" id="wrapper">
+
+
+<div id="page-content-wrapper">
+
+
+{%block content%}
+<div class="container" style="padding-top: 10px">
+
+  {%for card in cards%}
+    <div class="card" >
+    
+    <div class="card-title">
+      {{card.title}}   
+    </div>
+    <div class="card-content">
+      {{card.message}}
+    </div>
+  </div>
+  {%endfor%}
+</div>
+{%endblock%}
+</div>
+</div>
+</div>
+
+
+	
+
+
+
+</div>
+	
+</div>
+<div class="modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Modal body text goes here.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary">Save changes</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Se cargan los scripts de otras apps a traves del filto footer-->
+{% apply_filter "footer" request %}
+
+<!-- Se cargan scripts extras propios de la aplicacion actual-->
+{%for script in scripts%}
+<script type="module" src=/{{script}}></script>
+{%endfor%}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<script src="https://unpkg.com/element-ui@2.15.5/lib/index.js"></script>
+<script src="{%static 'asenzor/dist/main.js'%}"></script>
+<script>
+  M.AutoInit();
+  setTimeout(()=>{
+    let selects=document.querySelectorAll(".select-wrapper select")
+    for (let select of selects){
+     
+      if (select.options.selectedIndex!=-1){
+        let name= select.options[select.options.selectedIndex].innerHTML;
+        select.parentNode.querySelector("input").value=name
+      }
+      
+    }
+  },1000)
+  
+        
+</script>
+{%endblock%}
+
+{%block footer%}
+{%endblock%}
+
+
+
+
+

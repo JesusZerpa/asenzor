@@ -1,0 +1,57 @@
+{%block navbar%}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+   <button class="btn btn-primary" id="menu-toggle" >Menu2</button>
+
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+  <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+    <ul class="nav navbar-nav">
+      <li class="nav-item active">
+        <a href="{{BASE_URL}}" class="nav-link" ><span class="glyphicon glyphicon-home"></span> Home</a>
+      </li>
+      <li class="nav-item">
+        <a href="{{BASE_URL}}skills" class="nav-link" ><span class="glyphicon glyphicon-user"></span> Habilidades</a>
+      </li>
+
+      <li class="nav-item">
+        <a href="{{BASE_URL}}routines" class="nav-link" ><span class="glyphicon glyphicon-user"></span> Rutinas</a>
+      </li>
+      <li class="nav-item">
+        <a href="{{BASE_URL}}achievements" class="nav-link" ><span class="glyphicon glyphicon-user"></span> Logros</a>
+      </li>
+      <li class="nav-item">
+        <a href="{{BASE_URL}}works" class="nav-link" ><span class="glyphicon glyphicon-user"></span> Trabajos</a>
+      </li>
+     
+      
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown" role="button" aria-expanded="false"><span class="glyphicon glyphicon-info-sign"></span> Manejadores <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu">
+            <li class="nav-link" ><a href="{{BASE_URL}}thinking">Pensamiento</a></li>
+            <li class="nav-link" ><a href="{{BASE_URL}}language">Lenguaje</a></li>
+            <li class="nav-link" ><a href="{{BASE_URL}}codeblocks/logic">Logica</a></li>
+            
+          </ul>
+      </li>
+      <li class="navbar-right">
+      </li>
+
+      <li class="navbar-right">
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown" role="button" aria-expanded="false"><span class="glyphicon glyphicon-info-sign"></span> <img style="width: 30px;height: 30px;">{{user.get_username}}<span class="caret"></span></a>
+
+          <ul class="dropdown-menu" role="menu">
+            <li class="nav-link" ><a href="{{BASE_URL}}user/{{request.user.id}}/edit/">Editar perfil</a></li>
+            <li class="nav-link" ><a href="{{BASE_URL}}static/html/index.html">ayuda</a></li>
+            <li class="nav-link" ><a href="{{BASE_URL}}admin/logout">Cerrar session</a></li>
+          </ul>
+      </li>
+      
+      </li>
+    </ul>
+ 
+  </div>
+</nav>
+{%endblock%}

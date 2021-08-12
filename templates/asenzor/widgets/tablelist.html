@@ -1,0 +1,38 @@
+{%extends "asenzor/layouts/dashboard.html"%}
+{%block content%}
+<div>
+	<table class="table">
+		<thead>
+		<tr>
+			<th>
+			<input type="checkbox" name="id">
+			</th>
+			{%for elem2 in list_display%}	
+			<th>
+				{{elem2|get_field_label:model}}
+			</th>
+			{% endfor %}
+			{%if actions%}
+			<th>
+				Acciones
+			</th>
+			{%endif%}
+		</tr>
+	</thead>
+	<tbody>
+		{%for elem in object_list %}
+		<tr>
+			
+			{%for elem2 in list_display%}
+			{%if forloop.counter0 == 0%}
+			<td><input type="checkbox" name="id:{{elem.id}}"></td>
+			{%elif forloop.counter0 == 1%}
+			 <td><a href="/{{base_slug}}{{elem.id}}">{%get_index_value forloop.counter0 model list_display elem%}</a>
+			</td>
+
+		</tr>
+		{%endfor%}
+		</tbody>
+	</table>
+</div>
+{%endblock%}

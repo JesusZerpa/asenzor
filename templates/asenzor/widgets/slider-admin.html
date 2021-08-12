@@ -1,0 +1,28 @@
+<div >
+
+	<div style="overflow-x: scroll;">
+	
+		<draggable v-model="order" tag="transition-group" item-key="id" @change="change"  v-if="renderComponent">
+	<div v-for="(slide,k) in slides" :key="slide.id" style="display: inline-block;">
+
+		<img 
+			:order="k" 
+			:id="slide.id" 
+			:ref="'slides'" 
+		
+			:src="'{{BASE_URL}}media/'+slide.sizes.thumbail.url"
+			:srcset="'{{BASE_URL}}media/'+slide.sizes.thumbail.url+' 320w,\
+             {{BASE_URL}}media/'+slide.sizes.medium.url+' 480w,\
+             {{BASE_URL}}media/'+slide.sizes.full.url+' 800w'"
+        
+            sizes="(max-width: 320px) 280px,
+            (max-width: 480px) 440px,"
+		
+			style="max-width: 140px" 
+			@click="select(k)">
+	</div>
+</draggable>
+	</div>
+	<button v-if="slides.length" class="btn red" @click="remove()"><i class="material-icons left">delete</i>Eliminar slide</button>
+<button @click='open_modal()' class="btn"><i class="material-icons left">add</i>Añadir Slide</button>		
+</div>

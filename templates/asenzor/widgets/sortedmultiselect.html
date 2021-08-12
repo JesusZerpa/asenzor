@@ -1,0 +1,22 @@
+
+<div id="ballot" class="center">
+<ol id="{{widget_id}}" >
+
+{%for choice in choices%}
+  <li data-value="{{choice.0}}">{{choice.1}}</li>
+{%endfor%}
+</ol>
+<input type="hidden" name="{{name}}" value="{{value}}">
+</div>
+<script type="module">
+
+	import * as sortableselect from "{{script}}";
+	
+	$(function(){
+		sortableselect.sortable("#{{widget_id}}","{{name}}")
+	})
+	
+</script>
+
+{%block footer%}
+{%endblock%}

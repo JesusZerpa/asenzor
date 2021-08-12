@@ -1,0 +1,291 @@
+{% extends "asenzor/layouts/dashboard.html" %}
+{%load static%}
+{%load  custom_filters%}
+{%block head%}
+{{block.super}}
+<script type="text/javascript">
+	window.POST_BUILDER='{{post_builder}}'
+	window.POST_TYPE='{{post_type}}'
+	{%if post%}
+	window.POST_ID={{post.id}}
+	window.POST_MAIN_IMAGE='{{meta.main_image}}'
+	window.TEMPLATE='{{meta.template}}'
+	window.POST_ORDER={%if post.menu_order %}{{post.menu_order}}{%else%}0{%endif%}
+	{%endif%}
+</script>
+{%endblock%}
+{%block content%}
+
+<div id="post_toolbar">
+	<div class="options">
+	<a href="#screen-options">Opciones en pantalla</a>
+	<a href="#help">Ayuda</a>	
+	</div>
+	
+</div>
+<style type="text/css">
+	.search-field:focus{
+		outline: none;
+	}
+	.search-field{
+		background: rgba(0,0,0,0.04);
+		border: none;
+		width: 100%;
+	}
+	.navbar-fixed {
+		position:fixed;
+		top:0;
+		width: 100%;
+	}
+	.panel2-fixed {
+		position:fixed;
+	
+		top:66px;
+		max-width:240px;
+		height: calc(100vh - 66px);
+		right: 0px;
+		box-shadow:0px 4px 3px rgba(0,0,0,.5);
+	}
+	#panel2-short{
+		display: none;
+	}
+	@media(max-width: 425px){
+		.panel2-fixed {
+			top:0px;
+			position: relative;
+			right: inherit;
+
+		}
+		#panel2-short{
+			display: block;
+			position: fixed;
+			right: 5px;
+			bottom: 5px;
+			z-index: 1000;
+
+		}
+	}
+	
+	#alert{
+		z-index: 500;
+	}
+</style>
+
+{%for name,template in VUE_TEMPLATES.items%}
+	<script type="text/x-template" id="{{name}}">
+	{%include template%}
+	</script>
+	{%endfor%}
+
+<div id="edit_app" class="container-fluid" style="background: rgb(241, 241, 241)">
+
+	
+	<div class="row">
+		<div class="col m8 s12">
+			<br>
+	<div class="form-group">
+		<input 
+			v-model.trim="title" 
+			type="text" 
+			name="title" 
+			:ref="'title'"
+			value="{{post.title}}" 
+			class="form-control" 
+			required>
+	</div>
+	<div v-if="guid">
+		<div v-if="!edit_guid">
+			<a  :href="'{{BASE_URL}}'+guid+'/'">{{BASE_URL}}[[guid]]/</a><button @click="edit_guid=true">Editar</button>
+		</div>
+		<div v-else>
+			<input v-model="guid" ><button @click="edit_guid_method()">Guardar</button>
+		</div>
+	
+	
+	</div>
+	
+	<div style="margin-bottom: 50px">
+		<!--
+		<pre>
+		</pre>
+	-->
+		<input 
+			type="hidden" 
+			name="type" 
+			v-model="type" 
+			:ref="'type'" 
+			>
+			{%if post_builder == "custom"%}
+			{%if form%}
+			<div id="content">
+			{{form}}		
+			</div>
+			{%elif page%}
+			<div :ref="'panel1'">
+				<input placeholder="Buscar..." type="search" name="" 
+				style="">
+			<ul class="collapsible">
+			{%for key,group in page.items%}
+			<li>
+			<div class="collapsible-header"><i class="material-icons">build</i>{{key}}</div>
+			<div class="collapsible-body">
+				{%for name,item in group.items%}
+		
+			<div>
+			<label>{{name}}</label>	
+			</div>
+			<div >
+			{{item}}		
+			</div>
+				
+		
+			
+			{%endfor%}
+
+			</div>
+
+
+			<li>
+			{%endfor%}
+			<ul>
+			</div>
+			<!-- -->
+			{%endif%}
+		
+		
+     	{%else%}
+  
+		<editor
+       api-key="no-api-key"
+       :init="{
+         height: 500,
+         menubar: false,
+         plugins: [
+           'advlist autolink lists link image charmap print preview anchor',
+           'searchreplace visualblocks code fullscreen',
+           'insertdatetime media table paste code help wordcount',
+           'textcolor'
+         ],
+         toolbar:
+           'undo redo | formatselect | bold italic backcolor forecolor| \
+           alignleft aligncenter alignright alignjustify | \
+           bullist numlist outdent indent | removeformat | help'
+       }"
+       name="content"
+       :ref="'editor'"
+       :value='content'
+       v-model="content"
+       
+       
+     ></editor>	
+     	
+     	{%endif%}
+     	<div id="panel2-short">
+     		<button ><span class="btn" style="
+				background: url('{{BASE_URL}}static/img/arrowdown.png');
+				background-repeat: no-repeat;
+				background-size: contain;
+				background-position: center;">
+			</span> </button>
+     		<button class="btn btn-primary">Guardar</button>
+     	</div>
+	
+   </div>	
+		</div>
+		<div class="col m4">
+			<br>
+			<div :ref="'panel2'" class="panel2">
+			<input placeholder="Buscar..." type="search"
+				style="">
+			<div class="card">
+				<div class="card-title">
+					<b>Publicar</b>
+				</div>
+				<div class="card-content">
+				<button class="btn btn-primary" @click="publish()">Publicar</button>
+				<button v-if="guid || guid==''" class="btn btn-success" @click="save()">Guardar</button>
+				{%if post.id%}
+				<a href="" style="color: red">Eliminar</a>
+				{%endif%}	
+				<div >
+					<label>Estatus</label>
+				
+				
+				<div>
+					<select v-model="status">
+					<option value="publish">Publico</option>
+					<option value="private">Privado</option>
+					<option value="trash">Borrador</option>
+				</select>
+				<div v-if="status=='private'">
+					<label>Contraseña</label>
+				<input  v-model="password" type="password" style="max-width: 100%;">	
+				</div>	
+				</div>
+				</div>
+				
+				
+				</div>
+				
+
+				
+				
+			</div>
+			<br>
+			<div class="card">
+				<div class="card-title">
+					<b>Atributos de página</b>
+				</div>
+				<div class="card-content">
+					<div>
+				<label>Orden</label>
+				
+				<input  
+					v-model="order"  
+					:ref="'order'" 
+					type="number" 
+					name="" 
+					style="max-width: 50px;" >		
+					</div>
+				<div>
+				<label>Template</label>
+				<select v-model="template" :ref="'template'">
+					{%for elem in templates%}
+					<option>{{elem}}</option>
+					{%endfor%}
+				</select>	
+				</div>
+				
+				</div>
+				
+			</div>
+			<br>
+			<div class="card">
+				<div class="card-title">
+				</div>
+				<div class="card-content">
+					<div>
+						<span style="
+						position: absolute;
+						right:0;
+						cursor: pointer;" 
+						v-if="main_image"
+						@click="main_image=null">X</span>
+					<img style="max-width: 200px" :src="'{{BASE_URL}}media/'+main_image">	
+					</div>
+				<span @click="main_image_method()" style="color:lightblue;cursor: pointer;">Establecer imagen destacada</span>
+				</div>
+				
+			</div>	
+			</div>
+			
+		</div>
+	</div>
+	
+	
+	</div>
+
+{% include "asenzor/widgets/media.html"%}
+{%endblock%}
+{%block footer%}
+{%endblock%}

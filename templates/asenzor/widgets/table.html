@@ -1,0 +1,172 @@
+{% extends "asenzor/layouts/dashboard.html" %}
+{%load static%}
+{%load  custom_filters%}
+
+
+{%block head%}
+{{block.super}}
+<link rel="stylesheet" type="text/css" href="{% static 'css/simple-sidebar.css'%}">
+{%endblock%}
+
+
+{%block content%}
+<div id="toolbar">
+	{%if toolbar.btn_media_enabled%}
+	<button @click="open_modal()">Subir archivo</button>
+	{%endif%}
+	{% apply_filter 'table_toolbar' ''%}
+</div>
+
+<div class="container" id="table_app">
+	<div class="row">
+		<div class="col-md-12">
+			<h3>{{title}}</h3>
+	{%if description%}
+	<pre>{{description}}</pre>
+	{%endif%}
+
+	<div id="warnings">
+		{%for warning in warnings%}
+		<div class="alert {{warning.0}}">{{warning.1}}<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>
+		{%endfor%}
+	</div>
+	
+	
+	{%if enable_btn_create%}
+	<a href="{{request.get_full_path }}new/" class="btn btn-primary">{{btn_new}}</a>
+	{%endif%}
+	{%if enable_btn_back%}
+	<a href="{{request.get_full_path }}new/" class="btn btn-primary">{{btn_back}}</a>
+	{%endif%}
+	{%for btn in btns%}
+	<a href="{{btn.0}}" class="{{btn.2}}"
+	data-type="{{btn.3}}"
+	>
+	{{btn.1}}</a>
+	{%endfor%}
+	{%for btn in btns_custom%}
+	<button href="{{btn.href}}" class="{{btn.class}}"
+	{%if btn.id%}
+	id="{{btn.id}}"
+	{%endif%}
+	>
+	{{btn.label}}</button>
+	{%endfor%}
+
+	<div class="table-responsive">
+	<form method="GET" action="" >
+		<input type="search" name="q" placeholder="Busqueda" class="form-control">
+</form>
+
+<div id="table" data-json="{{json_controller}}" >
+	{% csrf_token %}
+	{{list_display}}
+	<table  >
+		<thead>
+		<tr>
+			<th>
+			<input type="checkbox" name="id" onclick="{self.marcar(event)}">
+			</th>
+			{%for elem2 in list_display%}	
+			<th>
+				
+				
+				
+			</th>
+			{% endfor %}
+			{%if actions%}
+			<th>
+				Acciones
+			</th>
+			{%endif%}
+		</tr>
+	</thead>
+	<tbody>
+		<form action="#">
+		{%for elem in object_list%}
+		
+		<tr>
+			
+			<td>
+				<p><label>
+					<input type="checkbox" name="id:{{elem.id}}">
+					<span></span>
+				</label></p></td>
+			{%for elem2 in list_display%}
+
+				{%if forloop.counter0 == 0%}
+				 <td><a href="{{request.get_full_path }}{{elem.id}}/">{%get_field_value forloop.counter0 model list_display elem%}</a></td>
+
+				{%else%}
+				<td>{%get_field_value forloop.counter0 model list_display elem%}</td>
+				{%endif%}
+
+			{%endfor%}
+			{%if actions%}
+			<td>
+				{% for action in actions%}
+
+				<a href="{{request.get_full_path }}{{elem.id}}/{{action.name}}/" class="{{action.class}}" style="{{action.style}}">{{action.label}}</a>
+				{%endfor%}
+				{%if custom_actions%}
+				{{custom_actions|actions:forloop.counter0|safe}}
+
+			
+				{%endif%}
+
+				{%if btnsformat%}
+				{{btnsformat|actions:forloop.counter0|safe}}
+				{%endif%}
+			</td>
+			{%endif%}
+
+		</tr>
+		{%endfor%}
+		</tbody>
+	</table>
+	</form>
+	<input id="delete" type="button" name="action" value="delete" class="btn red" onclick="{self.delete(event)}">
+</div>
+
+  <ul class="pagination ">
+    <li class="page-item disabled">
+      <a  href="#" tabindex="-1"><i class="material-icons">chevron_left</i></a>
+    </li>
+    
+    {%for num in num_pages%}
+    {%if page_current == num %}
+    <li class=" active">
+      <a  href="#">{{page_current}}
+      
+      </a>
+
+    </li>
+    {%else%}
+    <li class="waves-effect">
+      <a  href="?{{page_param}}={{num}}&{{params}}">{{num}}
+      </a>
+
+    </li>
+     {%endif%}
+    {%endfor%}
+    
+    <li class="waves-effect">
+      <a  href="#">
+      	<i class="material-icons">chevron_right</i></a>
+    </li>
+  </ul>
+
+	</div>
+			
+		</div>
+		
+	</div>
+	
+</div>
+
+{% include "asenzor/widgets/media.html"%}
+
+
+
+{%endblock%}
+

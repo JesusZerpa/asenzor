@@ -1,0 +1,15 @@
+{% extends "asenzor/layouts/dashboard.html" %}
+{%load  custom_filters%}
+{%block content%}
+<h1>{{name}}</h1>
+{%for elem in object_list%}
+<div class="alert alert-info">
+<h3>{{elem.title}}</h3>
+<div>
+{{elem.content}}		
+</div>
+
+</div>
+
+{%endfor%}
+{%endblock%}

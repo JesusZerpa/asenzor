@@ -1,0 +1,21 @@
+{% extends "asenzor/layouts/dashboard.html" %}
+{%load  custom_filters%}
+{%block content%}
+<div class="container">
+	<div class="row">
+		<div class="col-md-12">
+		<a href="{{btn_back}}" class="btn btn-primary">Regresar</a>
+		<h1>{{name}}</h1>
+		{%for elem in object_list%}
+		<ul>
+			<li><a href="{{elem.0}}" >{{elem.1}}</a> <a href="{{elem.2}}" class="btn btn-danger">Eliminar</a>
+
+			</li>
+		</ul>
+	
+		</div>	
+	</div>
+</div>
+
+{%endfor%}
+{%endblock%}
