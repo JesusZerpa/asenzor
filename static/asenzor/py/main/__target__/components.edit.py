@@ -275,6 +275,10 @@ class Edit(VuePy):
         modal=M.Modal.getInstance(document.querySelector("#media_modal"))
         modal.open()
     def insertContent(self,id,value):
+<<<<<<< HEAD
+=======
+        console.log("zzzzzzz",value)
+>>>>>>> 5ced66f386b580f2b5e0b9fa975a5a1f62ad9de6
         for elem in value:
             tinyMCE.js_get(id
                 ).execCommand(

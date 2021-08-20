@@ -1,6 +1,8 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.commands.runserver import Command as Runserver
+
 import shutil,subprocess,os
+
 def sass(self):
     if sys.argv[1]=="runserver":
         import subprocess
@@ -22,7 +24,6 @@ class Command(Runserver):
     def handle(self, *args, **options):
         from django.conf import settings
         for name in settings.COMPILE_APPS_WEBPACK:
-            print("@@@@@@@ ",name+"/static/"+name+"/py/")
             for folder in os.listdir(name+"/static/"+name+"/py/"):
                 if not os.path.isfile(name+"/static/"+name+"/py/"+folder)\
                     and folder not in ["node_modules"]\
@@ -43,3 +44,4 @@ class Command(Runserver):
                         +folder+".js")
  
         
+

@@ -74,7 +74,7 @@ class Pages(ResourceView):
 				#si la pagina tiene un template asignado 
 				#lee la configuracion del template
 				if template: 
-		
+
 					data["post"]["content"]=asenzor.serialize_template_admin_settings(template,request)
 					data["page"]=asenzor.compile_template_admin_settings(template,request,data["post"]["content"])
 			
@@ -82,11 +82,9 @@ class Pages(ResourceView):
 				try:
 					
 					data["post"]["content"]=json.loads(data["post"]["content"])
-
 					data["page"]=asenzor.compile_template_admin_settings(template,request,data["post"]["content"])
 				except Exception as e:
 					if data["post_builder"]=="custom":
-						
 						data["post"]["content"]=asenzor.serialize_template_admin_settings(template,request)
 						data["page"]=asenzor.compile_template_admin_settings(template,request,data["post"]["content"])
 
@@ -114,7 +112,7 @@ class Pages(ResourceView):
 			
 			print(data["post"]["content"])
 			"""
-	
+
 			data["DATA"]["post"]=data["post"]
 			data["DATA"]["meta"]=data["meta"]
 		if view=="new":

@@ -25,7 +25,6 @@ def watchdog_plugin(sender, **kwargs):
 
 def compile_webpack(name,path):
     pattern=name+"/static/"+name+r"/py/(\w+)/"
-
     folder=re.findall(name+"/static/"+name+r"/py/(\w+)",path)[0]
     if os.path.exists(name+"/static/"+name+"/py/"+folder+"/webpack.dev.js"):
         print("compilando webpack...",name,path)
@@ -37,6 +36,7 @@ def compile_webpack(name,path):
             cwd=name+"/static/"+name+"/py/"+folder
         )
         print(proc.communicate()[0].decode("utf-8"))
+
         shutil.move(name+"/static/"+name+"/py/"+folder+"/dist/main.js", name+"/static/"+name+"/dist/"+folder+".js")
         return proc
 
@@ -351,6 +351,7 @@ class AppConfig(AppConfig):
         para el webpack, esto es asi porque se espera que se compile cuando por 
         la url se accesa a un slug que pertenesca a dicha aplicacion
         """
+
         from django.utils.autoreload import file_changed,autoreload_started
         def killer(sender,**kwargs):
             self.observer.stop()
@@ -358,6 +359,7 @@ class AppConfig(AppConfig):
 
         file_changed.connect(killer)
         autoreload_started.connect(watchdog_plugin)
+
         if sys.argv[1]=="runserver":
             if os.environ.get('RUN_MAIN'):
         

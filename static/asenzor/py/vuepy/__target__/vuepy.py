@@ -46,12 +46,19 @@ class VuePy:
 	delimiters=['[[', ']]']
 	__deployed__=False
 	__link__=False
+<<<<<<< HEAD
 	async def __init__(self,settings={}):
 		data={"methods":{},
 			  "watch":{},
 			  "compute":{}}
 		data.update(settings)
 
+=======
+	async def __init__(self,*args,**kwargs):
+		data={"methods":{},
+			  "watch":{},
+			  "compute":{}}
+>>>>>>> 5ced66f386b580f2b5e0b9fa975a5a1f62ad9de6
 		
 
 		for elem in dir(self):

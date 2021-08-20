@@ -19,11 +19,17 @@ class Exception (BaseException):
     #__pragma__ ('kwargs')
     def __init__ (self, *args, **kwargs):
         self.__args__ = args
+<<<<<<< HEAD
         if kwargs.error != None:
             self.stack = kwargs.error.stack # Integrate with JavaScript Error object
         elif Error:
             self.stack = (__new__(Error())).stack # Create our own stack if we aren't given one
         else:
+=======
+        try:
+            self.stack = kwargs.error.stack # Integrate with JavaScript Error object
+        except:
+>>>>>>> 5ced66f386b580f2b5e0b9fa975a5a1f62ad9de6
             self.stack = 'No stack trace available'
     #__pragma__ ('nokwargs')
         

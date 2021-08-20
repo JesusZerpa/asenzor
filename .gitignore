@@ -1,9 +1,10 @@
 __pycache__/*
 templatetags/__pycache__/*
 template/__pycache__/*
-plugins/
+plugins/*
 !plugins/miPlugin.py
 !plugins/hello
+plugins/__pycache__/*
 static/node_modules/
 static/py/node_modules/
 migrations/__pycache__/*
