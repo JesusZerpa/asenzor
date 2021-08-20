@@ -1,5 +1,6 @@
 __pycache__/*
 templatetags/__pycache__/*
+template/__pycache__/*
 plugins/
 !plugins/miPlugin.py
 !plugins/hello
