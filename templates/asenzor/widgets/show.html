@@ -14,8 +14,8 @@
 	</div>
 	{%endfor%}	
 	</div>
-	<a href="{{request.get_full_path }}edit"class="btn btn-primary">Editar</a>
-	<a href="{{request.get_full_path }}delete"class="btn btn-danger">Eliminar</a>
+	<a href="{{request.get_full_path }}edit"class="btn ">Editar</a>
+	<a href="{{request.get_full_path }}delete"class="btn red">Eliminar</a>
 	{%for btn in btns%}
 	<a href="{{request.get_full_path }}{{btn.0}}" class="btn btn-primary">{{btn.1}}</a>
 	{%endfor%}

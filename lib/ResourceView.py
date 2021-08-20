@@ -15,6 +15,7 @@ from copy import copy
 from datetime import datetime,date,time
 from io import BytesIO
 from .zgrafic import thumbails
+from pprint import pprint
 
 '''
 def menu(menu,label,permissions=[],icon=None,to=None,position=-1,styles=None):
@@ -181,7 +182,7 @@ class ResourceView(object):
     warnings=[]
     filter={}
 
-    actions=[{"label":"Editar","name":"edit","class":"btn btn-primary"},{"label":"Eliminar","name":"delete","class":"btn btn-danger"}]
+    actions=[{"label":"Editar","name":"edit","class":"btn"},{"label":"Eliminar","name":"delete","class":"btn red"}]
     
 
     enable_custom_actions=False
@@ -207,6 +208,7 @@ class ResourceView(object):
     new_novalidate=False
     new_template="asenzor/widgets/new.html"
     custom_data={"edit":{},"index":{},"new":{},"delete":{}}
+    render=render
 
     
     def __init__(self,slug,urlpatterns,name=None):
@@ -218,11 +220,11 @@ class ResourceView(object):
         for k,elem in enumerate(self.btns):  
 
             if len(elem)<3:
-                self.btns[k]=list(elem)+["btn btn-primary"]
+                self.btns[k]=list(elem)+["btn "]
             elif len(elem)<4:
                 self.btns[k]=list(self.btns[k])
                 if elem[2]==None:
-                    self.btns[k]+=["btn btn-primary","get"]
+                    self.btns[k]+=["btn","get"]
                 
                 #name,url,class,method
 
@@ -782,6 +784,24 @@ class ResourceView(object):
     @classmethod
     def data(cls,request=None):
         return {"items":[]}
+    def html(self,request,content="",data={},template=None):
+        from django.template import RequestContext, Template
+        if type(content)==dict:
+            data=content
+        t = Template(content)
+        c = RequestContext(request, data)
+        html = t.render(c)
+
+        if template:
+            from django.template import engines
+            engine = engines['django']
+            template=engine.get_template(template)
+            html=template.render(data,request=request)
+        
+        
+        
+       
+        return HttpResponse(html)
 
 
 
@@ -921,7 +941,7 @@ class ResourceViewRest(ResourceView):
                 raise  e
     @csrf_exempt
     def api(self,request,id=None):
-
+        print("######",request.method)
         if request.method=="GET" and id:
             return self.get(request,id)
         if request.method=="GET":
@@ -978,7 +998,7 @@ class ResourceViewRest(ResourceView):
         
         if self.model:
             if request.body:
-                
+              
                 if request.headers["Content-Type"]=="application/json":
                     data=json.loads(request.body)  
                 else:
@@ -1041,6 +1061,7 @@ class ResourceViewRest(ResourceView):
 
             else:
                 return JsonResponse({"_meta":{"message":" No se proporcionaron los datos para crear el registro"},"item":None})
+    
         return HttpResponse("Debe implementar el metodo 'show'")
     def put(self,request,id=None,):
         """

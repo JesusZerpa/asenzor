@@ -35,8 +35,56 @@ function clone(obj) {
 }
 """)
 draggable=require('vuedraggable')
+alert("sssss")
 
 Vue.component("draggable",draggable)
+class Client:
+	def __init__(base="/"):
+		self.base=base
+		self.headers={}
+	def login(data,type="basic"):
+		if type=="basic":
+			self.headers["Autorization"]="basic "+btoa(data["username"]+":"+data["password"])
+		elif type=="token":
+			self.headers["Autorization"]="Bearer "+data
+	async def get(self,url,data={},headers={}):
+		headers.update(self.headers)
+		headers["method"]="GET"
+		return await fetch(self.base+url,{
+			"headers":headers,
+			"body":data
+			})
+	async def post(self,url,data={},headers={}): 
+		if "Content-Type" in headers and data.__proto__.constructor==FormData:
+			headers["Content-Type"]="application/json"
+			headers["Accept"]="appplication/json"
+		headers.update(self.headers)
+		headers["method"]="POST"
+		return await fetch(self.base+url,{
+			"headers":headers,
+			"body":data
+			})
+	async def patch(self,url,data={},headers={}):
+		if "Content-Type" in headers and data.__proto__.constructor==FormData:
+			headers["Content-Type"]="application/json"
+			headers["Accept"]="appplication/json"
+		headers.update(self.headers)
+		headers["method"]="PATCH"
+		return await fetch(self.base+url,{
+			"headers":headers,
+			"body":data
+			})
+
+	async def put(self,url,data={},headers={}):
+		if "Content-Type" in headers and data.__proto__.constructor==FormData:
+			headers["Content-Type"]="application/json"
+			headers["Accept"]="appplication/json"
+		headers.update(self.headers)
+		headers["method"]="PUT"
+		return await fetch(self.base+url,{
+			"headers":headers,
+			"body":data
+			})
 class VuePy:
 	"""docstring for VuePy"""
 	methods=[]
@@ -132,8 +180,9 @@ class VuePy:
 			
 			else:
 				data["data"]=getattr(self,"data")
-		
+		data["data"]["$api"]=Api("/json/")
 		self.__component__=data
+
 	def beforeCreate(self,vue):
 		self.vue=vue
 	def off(self,fn):
@@ -148,6 +197,7 @@ class VuePy:
 	
 	async def deploy(self):
 		if not self.__deployed__:
+
 			self.vue=__new__(Vue(self.__component__))
 			self.__deployed__=True
 		return self

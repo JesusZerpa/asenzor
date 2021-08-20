@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User, Group,Permission
+from django.contrib.contenttypes.models import ContentType
+
 from datetime import datetime
 from django.utils import timezone
 import jsonfield,json
@@ -72,7 +74,7 @@ class PostMeta(models.Model):
 			if instance.encrypted and value:
 				from django.apps import apps
 				asenzor=apps.get_app_config("asenzor")
-				value= asenzor.decode(instance.value,ansenzor.get_secret_key())
+				value= asenzor.decode(instance.value,asenzor.get_secret_key())
 			
 			if value:
 				value=json.loads(value)
@@ -89,7 +91,7 @@ class PostMeta(models.Model):
 		if encrypted:
 			from django.apps import apps
 			asenzor=apps.get_app_config("asenzor")
-			value=asenzor.endecode(value,ansenzor.get_secret_key())
+			value=asenzor.endecode(value,asenzor.get_secret_key())
 		try:
 			instance=cls.objects.get(post=id,key=key)
 			instance[key]=value
@@ -164,7 +166,7 @@ class UserMeta(models.Model):
 			instance=cls.objects.get(name=key)
 			if instance.encrypted:
 				asenzor=apps.get_app_config("asenzor")
-				return asenzor.decode(instance.value,ansenzor.get_secret_key())
+				return asenzor.decode(instance.value,asenzor.get_secret_key())
 			else:
 				return instance.value
 		except Exception as e:
@@ -174,7 +176,7 @@ class UserMeta(models.Model):
 		if encrypted:
 			from django.apps import apps
 			asenzor=apps.get_app_config("asenzor")
-			value=asenzor.encode(value,ansenzor.get_secret_key())
+			value=asenzor.encode(value,asenzor.get_secret_key())
 		try:
 
 			instance=cls.objects.get(name=key,user=user)
@@ -190,6 +192,8 @@ class UserMeta(models.Model):
 			instance=cls.objects.create(user=user,name=key,value=value,encrypted=encrypted)
 			instance.save()
 			return instance
+	def __str__(self):
+		return f"UserMeta[{self.id}]: {self.key} - {self.user.username}"
 
 
 class Comment(models.Model):
@@ -295,7 +299,7 @@ class Option(models.Model):
 		if encrypted:
 			from django.apps import apps
 			asenzor=apps.get_app_config("asenzor")
-			value=asenzor.encode(value,ansenzor.get_secret_key())
+			value=asenzor.encode(value,asenzor.get_secret_key())
 		try:
 			if site==None:
 				site=Site.get_master()
@@ -342,3 +346,16 @@ class App(models.Model):
 	user=models.ForeignKey(User,
 		on_delete=models.CASCADE,
 		help_text="Usuario que sera usado dedicado a la app para manaejar el acceso")
+
+
+class CustomPermission(Permission):
+
+    class Meta:
+        proxy = True
+
+    def save(self, *args, **kwargs):
+        ct, created = ContentType.objects.get_or_create(
+            model=self._meta.verbose_name, app_label=self._meta.app_label,
+        )
+        self.content_type = ct
+        super(CustomPermission, self).save(*args)

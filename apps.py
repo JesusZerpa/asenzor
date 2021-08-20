@@ -6,13 +6,25 @@ class MainConfig(AppConfig):
     name = 'asenzor'
     ejecutado=False
     plugins=[]
-    compile=["webpack"]
+    compile=["webpack","sass"]
     __version__="0.1.0"
+    warnings=[]
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.settings["webpack"]["entry"]["main"]="./asenzor/py/main.py"
         self.load_plugins()
+        
+
         self.register_template("asenzor/single.html",None)
+    def ready(self):
+        super().ready()
+        from asenzor.urls import urlpatterns
+        from asenzor.json import urlpatterns as apipatterns
+        from asenzor.menus import menus
+
+        for plugin in self.plugins:
+            plugin[0].Plugin(urlpatterns,apipatterns,menus)
+    
         
 
     def load_plugins(self):
@@ -23,7 +35,14 @@ class MainConfig(AppConfig):
 
                     self.plugins.append([modulo,None])#[modulo, instacia]
             except Exception as e:
-                print(e)
+                import traceback
+                from io import  StringIO
+                s=StringIO()
+                traceback.print_exc(file=s)
+                s.seek(0)
+                msg=s.read()
+                print(msg)
+                self.warnings.append(["admin_log",msg])
     def get_plugins(self):
         return self.plugins
     def get_secret_key(self):

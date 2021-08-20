@@ -7,11 +7,11 @@ from django.views.decorators.cache import cache_page
 from django.http import HttpResponse,HttpResponseRedirect
 from django.apps import apps
 # Create your views here.
+
 asenzor=apps.get_app_config('asenzor')
-
-
 @cache_page(0)
 @login_required
+
 def dashboard(request):
 	cards=[
 	{"title":"Bienvenido a ASENZOR",
@@ -26,8 +26,11 @@ class Pages(ResourceView):
 	new_template="asenzor/post.html"
 	edit_template="asenzor/post.html"
 	custom_data={
-	"new":{"post_builder":"post","post_type":"page","templates":asenzor.get_templates()},
-	"edit":{"post_type":"page","templates":asenzor.get_templates()},
+	"new":{"post_builder":"post",
+		   "post_type":"page",
+		   "templates":asenzor.get_templates()},
+	"edit":{"post_type":"page",
+			"templates":asenzor.get_templates()},
 	}
 	list_display=["title","name","status","author","modified"]
 	@classmethod
@@ -71,16 +74,19 @@ class Pages(ResourceView):
 				#si la pagina tiene un template asignado 
 				#lee la configuracion del template
 				if template: 
+		
 					data["post"]["content"]=asenzor.serialize_template_admin_settings(template,request)
 					data["page"]=asenzor.compile_template_admin_settings(template,request,data["post"]["content"])
 			
 			else:
 				try:
+					
 					data["post"]["content"]=json.loads(data["post"]["content"])
+
 					data["page"]=asenzor.compile_template_admin_settings(template,request,data["post"]["content"])
 				except Exception as e:
 					if data["post_builder"]=="custom":
-
+						
 						data["post"]["content"]=asenzor.serialize_template_admin_settings(template,request)
 						data["page"]=asenzor.compile_template_admin_settings(template,request,data["post"]["content"])
 
@@ -108,6 +114,7 @@ class Pages(ResourceView):
 			
 			print(data["post"]["content"])
 			"""
+	
 			data["DATA"]["post"]=data["post"]
 			data["DATA"]["meta"]=data["meta"]
 		if view=="new":
@@ -143,8 +150,12 @@ class Posts(ResourceView):
 	model=Post
 	filter={"type":"post"}
 	custom_data={
-	"new":{"post_builder":"post","post_type":"post","templates":asenzor.get_templates()},
-	"edit":{"post_builder":"custom","post_type":"post","templates":asenzor.get_templates()},
+	"new":{"post_builder":"post",
+		   "post_type":"post",
+		   "templates":asenzor.get_templates()},
+	"edit":{"post_builder":"custom",
+			"post_type":"post",
+			"templates":asenzor.get_templates()},
 	}
 
 
@@ -338,6 +349,7 @@ class Plugins(ResourceView):
 					"version":elem[0].__version__,
 					"description":elem[0].__doc__ if elem[0].__doc__ else "",
 					})
+		
 			data["object_list"]=items
 			data["list_display"]=["name","description"]
 		elif view=="new":
@@ -448,7 +460,7 @@ def dynamic_views(request):
 					elif request.method=="GET":
 						users_authenticated=PostMeta.get(elem,"users_authenticated",[])
 						if request.user.is_authenticated:
-							print("rrrrrrr",users_authenticated)
+							
 							if request.user.id not in users_authenticated:
 								template="asenzor/content-authenticated.html"
 								authenticated=False
@@ -461,7 +473,7 @@ def dynamic_views(request):
 				if authenticated:
 					if elem.type=="page":
 						template=meta.get(elem.id,"template",site.name+"/single.html")
-				print("oooooooooo",template)	
+	
 				return {"template":template,"post":elem}
 
 				

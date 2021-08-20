@@ -61,7 +61,7 @@ class Edit(VuePy):
         vue.edit_guid=False
         console.log(vue.guid)
         form=__new__(FormData)()
-        form.append("guid",vue.guid)
+        form.append("guid","/"+vue.guid+"/")
         form.append("id",POST_ID)
         req=await fetch("/json/posts/",{
             "body":form,

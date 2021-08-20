@@ -3,7 +3,8 @@ from django.conf import settings # import the settings file
 def context(request):
     # return the value you want as a dictionnary. you may add multiple values in there.
     from .signals import render_started
-    
+    from django.apps import apps
+    asenzor=apps.get_app_config("asenzor")
     render_started.send(sender=request)    
     """
     BASE_URL=settings.BASE_URL
@@ -16,9 +17,17 @@ def context(request):
     if request.META['REMOTE_ADDR']!="127.0.0.1" and settings.DEBUG:
     	BASE_URL_CLEAN=settings.PRIVATE_HOST
     """
-    
+    warnings=""
+    for elem in asenzor.warnings:
+        if request.user.has_perm(elem[0]):
+            warnings+=elem[1]
+    print("iiiiiiiiiii")
+    print(warnings)
     data={'BASE_URL': request.scheme+"://"+request.get_host()+settings.BASE_URL,
     'ASENZOR_URL': request.scheme+"://"+request.get_host()+settings.ASENZOR_URL,
-    'MEDIA_URL': request.scheme+"://"+request.get_host()+settings.MEDIA_URL}
+    'MEDIA_URL': request.scheme+"://"+request.get_host()+settings.MEDIA_URL,
+    "WARNINGS":warnings,
+    }
+    
     data.update(settings.MENUS)
     return data

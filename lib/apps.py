@@ -6,6 +6,49 @@ from copy import copy
 from uuid import uuid4
 import subprocess
 import json
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
+import re,shutil
+from pathlib import Path
+def watchdog_plugin(sender, **kwargs):
+    watch = sender.extra_files.add
+    
+    for root, dirs, files in os.walk("asenzor/plugins/"):
+        for name in files:
+            file=os.path.join(root, name)
+            if file.endswith(".py"):
+                watch(Path(file))
+
+                
+    # to listen to multiple files, use watch_dir, e.g.
+    # sender.watch_dir('/tmp/', '*.bar')
+
+def compile_webpack(name,path):
+    pattern=name+"/static/"+name+r"/py/(\w+)/"
+
+    folder=re.findall(name+"/static/"+name+r"/py/(\w+)",path)[0]
+    if os.path.exists(name+"/static/"+name+"/py/"+folder+"/webpack.dev.js"):
+        print("compilando webpack...",name,path)
+
+        import subprocess
+        proc = subprocess.Popen(
+            ["npx","webpack","--config","webpack.dev.js"],
+            stdout=subprocess.PIPE,
+            cwd=name+"/static/"+name+"/py/"+folder
+        )
+        print(proc.communicate()[0].decode("utf-8"))
+        shutil.move(name+"/static/"+name+"/py/"+folder+"/dist/main.js", name+"/static/"+name+"/dist/"+folder+".js")
+        return proc
+
+class MyEventHandler(FileSystemEventHandler):
+    def __init__(self,app):
+        self.app=app
+    def on_modified(self, event):
+        #esto porque tambien se registra la modificacion de la carpeta
+        if event.src_path.endswith(".py"):
+            compile_webpack(self.app,event.src_path)
+
+        print(event.src_path, "modificado.")
 
 
 def get_process():
@@ -96,6 +139,7 @@ class ValueAttr(json.JSONEncoder):
 
 templates={}
 widgets={}
+process=[]
 
 class AppConfig(AppConfig):
     """docstring for """
@@ -125,10 +169,9 @@ class AppConfig(AppConfig):
         super().__init__(*args,**kwargs)
         if os.path.exists(self.name+'/settings.json'):
             with open(self.name+'/settings.json') as f:
-                settings=f.read()
-                if settings:
-                    self.settings=json.loads(settings)
-
+                _settings=f.read()
+                if _settings:
+                    self.settings=json.loads(_settings)
 
 
         self.settings["webpack"]["output"]["path"]=os.path.abspath("./"+self.name+'/static/'+self.name+'/dist/')
@@ -138,17 +181,52 @@ class AppConfig(AppConfig):
         from asenzor.signals import app_loaded
         app_loaded.connect(receiver=self.load_requests)
         app_loaded.connect(receiver=self.load_actions)
-                
+      
+        if self.name in settings.COMPILE_APPS_WEBPACK:
+            self.webpack()
+        if self.name in settings.COMPILE_APPS_SASS:
+            self.sass()    
     
     
     def ready(self):
         super().ready()
         from asenzor.signals import render_started
         from asenzor.signals import app_loaded
+
+        from asenzor.models import CustomPermission,User
+    
         render_started.connect(receiver=self.load_menu)
         render_started.connect(receiver=self.load_urls)
         app_loaded.send(sender=self)
-    
+        permissions=[]
+        try:
+            permissions+=[
+                CustomPermission.objects.get(codename="admin_log"),
+                CustomPermission.objects.get(codename="public_log")
+            ]
+
+        except:
+            permissions+=[
+                CustomPermission.objects.create(
+                    codename="admin_log",
+                    name="Registros del Administrador"),
+                CustomPermission.objects.create(
+                    codename="public_log",
+                    name="Registros del publicos")
+            ]
+        for user in User.objects.all():
+            if user.is_staff:
+                for perm in permissions:
+                   
+                    if not user.has_perm(perm.codename):
+                        
+                        user.user_permissions.add(perm)
+                user.save()
+        
+
+
+
+        
     def load_menu(self,sender=None,*args,**kwargs):
         from imp import load_source
         import os
@@ -160,8 +238,14 @@ class AppConfig(AppConfig):
             method=item[2]
             permissions=[]
             if method:
-                view,method=method.split(".")
-                classview=getattr(__import__(self.label+".views").views,view)
+                if type(method)==str:
+                    view,method=method.split(".")
+                    classview=getattr(__import__(self.label+".views").views,view)
+                else:
+                    classview=method[0]
+                    view=getattr(classview,method[1])
+                    method=method[1]
+                
                 if method in classview.permissions:
                     permissions=classview.permissions[method]
             icon=item[3]
@@ -258,89 +342,69 @@ class AppConfig(AppConfig):
 
 
     def register_process(self,proc):        
-        with open(self.name+"/.block") as f:
-            process=f.read()
-        with open(self.name+"/.block","w") as f:
-            f.write(process+str(proc.pid)+"\n")
-    ''' 
+        global process
+        process.append(proc)
+    
     def webpack(self):
         """
         Dada el nombre de la aplicacion se procede a crear el archivo de mezcla 
         para el webpack, esto es asi porque se espera que se compile cuando por 
         la url se accesa a un slug que pertenesca a dicha aplicacion
         """
+        from django.utils.autoreload import file_changed,autoreload_started
+        def killer(sender,**kwargs):
+            self.observer.stop()
+            print("THREADS:",self.threads)
+
+        file_changed.connect(killer)
+        autoreload_started.connect(watchdog_plugin)
         if sys.argv[1]=="runserver":
+            if os.environ.get('RUN_MAIN'):
         
-            with open(self.name+'/settings.json',"w") as f:
-                f.write(json.dumps(self.settings,indent=2))
+                self.observer = Observer()
+             
+                
 
-            def webpack_compile():
-                if os.path.exists(self.name+"/static/webpack.config.js") and settings.DEBUG and self.can_compile:
-                    print("compilando webpack...")
-                    import subprocess
-                    proc = subprocess.Popen(
-                        ['cd '+self.name+'/static/ && npx webpack --config webpack.config.js --watch'],
-                        shell=True,
-                        stdout=subprocess.PIPE,
-                    )
-                    return proc
+                for (dirpath, dirnames, filenames) in os.walk("./"+self.name+"/static/"+self.name+"/py/"):
+                    
+                    if not ("node_modules" in dirpath or 
+                        "__target__" in dirpath or 
+                        "/dist" in dirpath ):
 
-            if not self.is_blocked('cd '+self.name+'/static/ && npx webpack --config webpack.config.js --watch'):
-                proc=webpack_compile()
-                self.register_process(proc)
-                thread=threading.Thread(target=show_proc,args=(proc,))
+                        self.observer.schedule(MyEventHandler(self.name),
+                        dirpath)
+                    
+                self.observer.start()
+
+                def alive():
+                    try:
+                        while self.observer.is_alive():
+                            self.observer.join(1)
+                    except KeyboardInterrupt:
+                        self.observer.stop()
+                    self.observer.join()
+                
+        
+                """      
+                """  
+                thread=threading.Thread(target=alive)
                 self.threads.append(thread)
                 thread.start()
-    '''
-    
-    """
-    def sass(self,path=""):
+                
+    def sass(self):
         if sys.argv[1]=="runserver":
-            def sass_compile():
-                if settings.DEBUG and self.can_compile:
-                    print("compilando sass...")
-            
-                    import subprocess
-                    proc = subprocess.Popen(
-                        ['cd '+self.name+'/static/'+path+' && sass --watch sass:css'],
-                        shell=True,
-                        stdout=subprocess.PIPE,
-                    )
-                    return proc
-
-            if not self.is_blocked('cd '+self.name+'/static/'+path+' && sass --watch sass:css'):
-                proc=sass_compile()
-                self.register_process(proc)
-                thread=threading.Thread(target=show_proc,args=(proc,))
-                self.threads.append(thread)
-                thread.start()
-    """
-    def sass(self,path=""):
-        if sys.argv[1]=="runserver":
-            def sass_compile():
-                if settings.DEBUG and self.can_compile:
-                    print("compilando sass...")
-                    lastmodified=os.stat(self.name+'/static/'+path).st_mtime
-                    while True:
-                        if lastmodified!=os.stat(self.name+'/static/'+path).st_mtime:
-                            import subprocess
-                            proc = subprocess.Popen(
-                                ['cd '+self.name+'/static/'+path+' && sass --watch sass:css'],
-                                shell=True,
-                                stdout=subprocess.PIPE,
-                            )
-                            lastmodified=os.stat(self.name+'/static/'+path).st_mtime
-                        time.sleep(1)
-
-                    self.register_process(proc)
-                    #return proc
+            import subprocess
+            proc = subprocess.Popen(
+                ["sass","--watch",f"{self.name}/scss:{self.name}/css"],
+                stdout=subprocess.PIPE,
+                cwd=self.name+'/static/'
+            )
+            self.register_process(proc)
             """
-            if not self.is_blocked('cd '+self.name+'/static/'+path+' && sass --watch sass:css'):
-                #proc=sass_compile()
-            """ 
             thread=threading.Thread(target=sass_compile)
             self.threads.append(thread)
             thread.start()
+            """
     def register_template(self,path,options,overwrite=False):
         """
         Este metodo esta pensado para los posts de paginas las cuales se les
@@ -403,12 +467,15 @@ class AppConfig(AppConfig):
         if not options:
             return {}
 
+
         if type(options)==dict:
 
             for option in options:
                 page[option]={}
+                
                 for elem in options[option]:
                     
+                      
                     if isinstance(elem,WidgetBox) and elem.name not in l:
                         value=""
                       
@@ -423,7 +490,9 @@ class AppConfig(AppConfig):
                                         value=json.dumps(value)
                                     elem.value[name]=value
                                 page[option][elem.name]=elem.render_settings(request)
+                            
                         else:
+                           
                             page[option][elem.name]=elem.render_settings(request)
                             
                     elif elem["type"] in dir(forms):
@@ -445,6 +514,7 @@ class AppConfig(AppConfig):
                                 
                         widget.attrs["value"]=value
                         page[option][elem["name"]]=widget.render(option+"."+elem["name"],value)
+                       
 
                     elif elem["type"] in dir(asenzor.widgets):
                        
@@ -465,7 +535,7 @@ class AppConfig(AppConfig):
                                 value=elem["value"]
                        
                         widget.attrs["value"]=value
-
+                        
                         
                         page[option][elem["name"]]=widget.render(option+"."+elem["name"],value)
 
@@ -485,10 +555,10 @@ class AppConfig(AppConfig):
                             if "value" in elem:
                                 value=elem["value"]
                          
-                                
+        
                         widget.attrs["value"]=value
                         page[option][elem["name"]]=widget.render(option+"."+elem["name"],value)
-                        
+             
 
                         
 

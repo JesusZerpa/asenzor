@@ -1,6 +1,6 @@
 <div style="background: url('{{BASE_URL}}static/img/tiles-transparent.jpg')">
 
 	
-	<img v-if="image" :src="'{{BASE_URL}}media/'+image.src" style="max-width: 300px">
+	<img v-if="image" :src="'{{BASE_URL}}media/'+image.src" style="max-width: 240px;display: block;">
 	<button @click="open_modal()" class="btn btn-primary">Cargar imagen</button>
 </div>

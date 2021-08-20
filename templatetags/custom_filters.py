@@ -1,4 +1,5 @@
 from django import template
+from django.apps import apps
 from django.http import HttpResponse,HttpResponseRedirect
 register = template.Library()
 import logging,coloredlogs
@@ -129,6 +130,14 @@ def key(item,value):
 def show_type(item):
     return type(item)
 
+@register.filter
+def get_usermeta(name,user=None):
+    print("xxxxxxxxx",name,user)
+    UserMeta=apps.get_model("asenzor","UserMeta")
+    #from asenzor.models import UserMeta
+    
+    return UserMeta.objects.get(id=user.id,key=name).value
+    
 
 from django.conf import settings
 from django.apps import apps
@@ -202,12 +211,4 @@ def compile():
                         
                 time.sleep(.5)
 
-if "COMPILE" in dir(settings) and settings.COMPILE:
-    thread=threading.Thread(target=compile)
-    #self.threads.append(thread)
-    thread.start()
 
-    #sass()
-    """
-    self.sass(self.name)
-    """
